@@ -11,4 +11,5 @@ func AuthRoutes(rg *gin.RouterGroup, h *handlers.UserHandler) {
 	auth.POST("/login", h.Login)
 	auth.GET("/validateToken", h.ValidateToken)
 	auth.POST("/signUp", h.CreateUserAccount)
+	auth.POST("/refreshToken", h.RefreshToken)
 }

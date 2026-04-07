@@ -6,3 +6,14 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE INDEX IF NOT EXISTS  idx_user_email ON users(email);
+
+
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+                                              id SERIAL PRIMARY KEY,
+                                              user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+CREATE INDEX IF NOT EXISTS idx_refresh_user ON refresh_tokens(user_id);

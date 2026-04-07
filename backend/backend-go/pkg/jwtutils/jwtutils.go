@@ -26,3 +26,13 @@ func ValidateToken(token string) (*jwt.Token, error) {
 		return secretKey, nil
 	})
 }
+func GenerateRefreshToken(userID int) (string, error) {
+
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"exp":     time.Now().Add(7 * 24 * time.Hour).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(secretKey)
+}

@@ -50,19 +50,13 @@ func (handler *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := handler.service.Login(req.Email, req.Password)
+	user, accessToken, refreshToken, err := handler.service.Login(req.Email, req.Password)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	token, err := jwtutils.GenerateToken(int(user.Id), user.Email)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not generate token"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"user_id": user.Id, "email": user.Email, "balance": user.Balance, "token": token})
+	c.JSON(http.StatusOK, gin.H{"user_id": user.Id, "email": user.Email, "balance": user.Balance, "accessToken": accessToken, "refreshToken": refreshToken})
 }
 func (handler *UserHandler) ValidateToken(c *gin.Context) {
 
@@ -94,5 +88,37 @@ func (handler *UserHandler) ValidateToken(c *gin.Context) {
 		"valid":   true,
 		"user_id": claims["user_id"],
 		"email":   claims["email"],
+	})
+}
+
+func (handler *UserHandler) RefreshToken(c *gin.Context) {
+
+	var req struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "invalid request"})
+		return
+	}
+
+	token, err := jwtutils.ValidateToken(req.RefreshToken)
+	if err != nil || !token.Valid {
+		c.JSON(401, gin.H{"error": "invalid token"})
+		return
+	}
+
+	userID, err := handler.service.FindRefreshToken(req.RefreshToken)
+	if err != nil {
+		c.JSON(401, gin.H{"error": "token not found"})
+		return
+	}
+
+	user, _ := handler.service.FindUserByID(userID)
+
+	newAccessToken, _ := jwtutils.GenerateToken(userID, user.Email)
+
+	c.JSON(200, gin.H{
+		"access_token": newAccessToken,
 	})
 }
