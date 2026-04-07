@@ -1,14 +1,22 @@
 package main
 
 import (
+	internalgrpc "Color-Trading/backend/backend-go/internal/grpc"
+	"Color-Trading/backend/backend-go/internal/repositories/postgres"
 	"Color-Trading/backend/backend-go/internal/routes"
+	"Color-Trading/backend/backend-go/internal/services"
 	"Color-Trading/backend/backend-go/pkg/database/migrations"
+
+	pb "Color-Trading/backend/backend-go/Color-Trading/backend/backend-go/proto/bettingpb"
+
 	"database/sql"
 	"fmt"
 	"log"
+	"net"
 	"time"
 
 	_ "github.com/lib/pq"
+	"google.golang.org/grpc"
 )
 
 func InitPostgres() *sql.DB {
@@ -26,20 +34,45 @@ func InitPostgres() *sql.DB {
 		log.Fatal("Error Pinging Postgres:", err)
 	}
 
-	fmt.Println(" Connected to Postgres")
+	fmt.Println("Connected to Postgres")
 	return db
 }
 
 func main() {
 	db := InitPostgres()
+
 	err := migrations.RunMigrations(db)
 	if err != nil {
 		log.Fatal("Error Running Migrations:", err)
 	}
 
+	userRepo := postgres.NewUserRepository(db)
+	walletRepo := postgres.NewWalletRepository(db)
+	walletService := services.NewWalletService(walletRepo, &userRepo)
+
+	go startGRPCServer(walletService)
+
 	router := routes.SetUpRouter(db)
 
-	fmt.Println(" Server running on :8080")
-
+	fmt.Println("HTTP Server running on :8080")
 	router.Run(":8080")
+}
+func startGRPCServer(walletService *services.WalletService) {
+
+	lis, err := net.Listen("tcp", ":8082")
+	if err != nil {
+		log.Fatal("Error Listening:", err)
+	}
+
+	grpcServer := grpc.NewServer()
+
+	bettingServer := internalgrpc.NewBettingServer(*walletService)
+
+	pb.RegisterBettingServiceServer(grpcServer, bettingServer)
+
+	fmt.Println("gRPC Server running on :8082")
+
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatal("gRPC server failed:", err)
+	}
 }

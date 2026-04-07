@@ -1,0 +1,19 @@
+syntax= "proto3";
+package betting;
+
+option go_package = "Color-Trading/backend/backend-go/proto/bettingpb";
+
+service BettingService{
+  rpc placeBet(BetRequest) returns (BetResponse);
+
+}
+message BetRequest {
+  int32 user_id =1;
+  int64 amount = 2;
+  string color = 3;
+}
+
+message BetResponse {
+  bool success = 1;
+  string message = 2;
+}
