@@ -122,3 +122,23 @@ func (handler *UserHandler) RefreshToken(c *gin.Context) {
 		"access_token": newAccessToken,
 	})
 }
+
+func (handler *UserHandler) Logout(c *gin.Context) {
+
+	var req struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "invalid request"})
+		return
+	}
+
+	err := handler.service.DeleteRefreshToken(req.RefreshToken)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to logout"})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "logged out successfully"})
+}

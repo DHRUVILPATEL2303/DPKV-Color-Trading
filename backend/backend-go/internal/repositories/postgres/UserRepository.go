@@ -30,7 +30,7 @@ type UserRepository interface {
 	GetUserByEmail(email string) (user *models.User, err error)
 	SaveRefreshToken(userId int, refreshToken string, expiredAt time.Time) error
 	FindRefreshToken(refreshToken string) (int, error)
-	DeleteRefreshToken(token int) error
+	DeleteRefreshToken(token string) error
 	FindUserByID(userID int) (*models.User, error)
 }
 
@@ -54,7 +54,7 @@ func (u *userRepository) FindRefreshToken(refreshToken string) (int, error) {
 	return userId, nil
 }
 
-func (u *userRepository) DeleteRefreshToken(token int) error {
+func (u *userRepository) DeleteRefreshToken(token string) error {
 	_, err := u.db.Exec("DELETE FROM refresh_tokens WHERE token = $1", token)
 	if err != nil {
 		return err

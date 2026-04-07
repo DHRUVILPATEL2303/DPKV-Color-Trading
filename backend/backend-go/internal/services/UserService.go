@@ -81,3 +81,10 @@ func (s *UserService) FindUserByID(id int) (user *models.User, err error) {
 	return byID, nil
 
 }
+func (s *UserService) DeleteRefreshToken(refreshToken string) (err error) {
+	err = s.repo.DeleteRefreshToken(refreshToken)
+	if err != nil {
+		return err
+	}
+	return nil
+}
