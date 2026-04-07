@@ -19,7 +19,12 @@ func SetUpRouter(db *sql.DB) *gin.Engine {
 	userService := services.NewUserService(userRepo)
 	userHandler := handlers.NewUserHandler(userService)
 
+	walletRepo := postgres.NewWalletRepository(db)
+	walletService := services.NewWalletService(walletRepo, &userRepo)
+	walletHandler := handlers.NewWalletHandler(walletService)
+
 	AuthRoutes(api, userHandler)
+	WalletRoutes(api, walletHandler)
 
 	return r
 }
