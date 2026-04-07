@@ -20,7 +20,7 @@ func NewBettingServer(walletService services.WalletService) *BettingServer {
 	}
 }
 
-func (b *BettingServer) placeBet(ctx context.Context, req *pb.BetRequest) (*pb.BetResponse, error) {
+func (b *BettingServer) PlaceBet(ctx context.Context, req *pb.BetRequest) (*pb.BetResponse, error) {
 	err := b.walletService.DeductAmount(int(req.Amount), int(req.UserId))
 	if err != nil {
 		return &pb.BetResponse{

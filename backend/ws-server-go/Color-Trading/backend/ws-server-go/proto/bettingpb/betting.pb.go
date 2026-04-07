@@ -147,7 +147,7 @@ const file_proto_betting_proto_rawDesc = "" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage2G\n" +
 	"\x0eBettingService\x125\n" +
-	"\bPlaceBet\x12\x13.betting.BetRequest\x1a\x14.betting.BetResponseB2Z0Color-Trading/backend/backend-go/proto/bettingpbb\x06proto3"
+	"\bPlaceBet\x12\x13.betting.BetRequest\x1a\x14.betting.BetResponseB4Z2Color-Trading/backend/ws-server-go/proto/bettingpbb\x06proto3"
 
 var (
 	file_proto_betting_proto_rawDescOnce sync.Once

@@ -4,7 +4,7 @@ package betting;
 option go_package = "Color-Trading/backend/backend-go/proto/bettingpb";
 
 service BettingService{
-  rpc placeBet(BetRequest) returns (BetResponse);
+  rpc PlaceBet(BetRequest) returns (BetResponse);
 
 }
 message BetRequest {
