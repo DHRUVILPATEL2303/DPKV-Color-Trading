@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
-	"net"
-
 	"en/internal/engine"
 	grpc2 "en/internal/grpc"
+	"en/internal/publisher"
+	"log"
+	"net"
 
 	pb "en/Color-Trading/backend/engine-server/proto/enginepb"
 
@@ -18,10 +18,11 @@ func main() {
 	store := engine.NewBetStore()
 
 	apiClient := grpc2.NewClient()
+	publisher := publisher.NewPublisher()
 
 	engineInstance := engine.NewEngine(manager, store, apiClient.Betting)
 
-	go engine.StartGameLoop(manager, store)
+	go engine.StartGameLoop(manager, store, publisher, apiClient.Betting)
 
 	go startGRPC(engineInstance)
 

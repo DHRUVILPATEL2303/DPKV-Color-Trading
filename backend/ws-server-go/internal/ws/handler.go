@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"ws-server-go/ws-server-go/Color-Trading/backend/ws-server-go/proto/enginepb"
 
+	enginepb "ws-server-go/ws-server-go/Color-Trading/backend/ws-server-go/proto/enginepb"
 	grpcclient "ws-server-go/ws-server-go/internal/grpc"
 
 	"github.com/gorilla/websocket"
@@ -22,7 +22,7 @@ type Message struct {
 	Color  string `json:"color"`
 }
 
-func HandleWS(client *grpcclient.EngineClient) http.HandlerFunc {
+func HandleWS(hub *Hub, client *grpcclient.EngineClient) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -31,7 +31,13 @@ func HandleWS(client *grpcclient.EngineClient) http.HandlerFunc {
 			log.Println("Upgrade error:", err)
 			return
 		}
-		defer conn.Close()
+
+		hub.AddClient(conn)
+
+		defer func() {
+			hub.RemoveClient(conn)
+			conn.Close()
+		}()
 
 		for {
 			var msg Message
