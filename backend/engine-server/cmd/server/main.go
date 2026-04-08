@@ -4,6 +4,7 @@ import (
 	"en/internal/engine"
 	grpc2 "en/internal/grpc"
 	"en/internal/publisher"
+	redis2 "en/internal/redis"
 	"log"
 	"net"
 
@@ -14,6 +15,7 @@ import (
 
 func main() {
 
+	redis := redis2.RedisClient()
 	manager := engine.NewManager()
 	store := engine.NewBetStore()
 
@@ -22,7 +24,7 @@ func main() {
 
 	engineInstance := engine.NewEngine(manager, store, apiClient.Betting)
 
-	go engine.StartGameLoop(manager, store, publisher, apiClient.Betting)
+	go engine.StartGameLoop(manager, store, publisher, redis, apiClient.Betting)
 
 	go startGRPC(engineInstance)
 

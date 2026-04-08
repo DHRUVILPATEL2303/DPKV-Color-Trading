@@ -3,16 +3,25 @@ package engine
 import (
 	"context"
 	"en/internal/publisher"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
 	pb "en/Color-Trading/backend/engine-server/proto/bettingpb"
+
+	"github.com/redis/go-redis/v9"
 )
 
-func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, api pb.BettingServiceClient) {
-
-	roundID := 1
+func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, rdb *redis.Client, api pb.BettingServiceClient) {
+	var roundID int
+	ctx := context.Background()
+	val, err := rdb.Get(ctx, "current_round").Int()
+	if err != nil {
+		roundID = 1
+	} else {
+		roundID = val + 1
+	}
 
 	for {
 
@@ -60,9 +69,6 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 			"round_id": roundID,
 			"result":   result,
 		})
-		if err != nil {
-			return
-		}
 
 		betResult, err := api.UpdateBetResult(context.Background(), &pb.UpdateBetRequest{
 			Round: int64(roundID),
@@ -72,10 +78,23 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 			log.Println(err)
 			log.Println("for round %s betting result for updaterequest %s", roundID, betResult)
 		}
+
+		data := map[string]any{
+			"round":  roundID,
+			"result": result,
+		}
+
+		jsonData, _ := json.Marshal(data)
+		fmt.Println(string(jsonData))
+		rdb.LPush(ctx, "recent_rounds", jsonData)
+		rdb.LTrim(ctx, "recent_rounds", 0, 9)
+
 		go SettleBetsWorkerPool(bets, result, api)
 
 		store.Clear()
-
+		if err := rdb.Set(ctx, "current_round", roundID, 0).Err(); err != nil {
+			log.Println("Redis SET error:", err)
+		}
 		roundID++
 	}
 }
