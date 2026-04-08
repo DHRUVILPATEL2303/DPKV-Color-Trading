@@ -1,12 +1,11 @@
 package grpc
 
 import (
+	pb "Color-Trading/backend/backend-go/Color-Trading/backend/backend-go/proto/bettingpb"
 	"Color-Trading/backend/backend-go/internal/services"
+	_ "Color-Trading/backend/backend-go/internal/services"
 	"context"
 	_ "context"
-
-	pb "Color-Trading/backend/backend-go/Color-Trading/backend/backend-go/proto/bettingpb"
-	_ "Color-Trading/backend/backend-go/internal/services"
 )
 
 type BettingServer struct {
@@ -34,4 +33,18 @@ func (b *BettingServer) PlaceBet(ctx context.Context, req *pb.BetRequest) (*pb.B
 		Message: "Bet Placed Successfully",
 	}, nil
 
+}
+func (b *BettingServer) CreditAmount(ctx context.Context, req *pb.CreditRequest) (*pb.CreditResponse, error) {
+	err := b.walletService.AddAmount(int(req.Amount), int(req.UserId))
+	if err != nil {
+		return &pb.CreditResponse{
+			Success: false,
+			Amount:  req.Amount,
+		}, err
+	}
+
+	return &pb.CreditResponse{
+		Success: true,
+		Amount:  req.Amount,
+	}, nil
 }

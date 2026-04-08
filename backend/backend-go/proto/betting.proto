@@ -3,9 +3,17 @@ package betting;
 
 option go_package = "Color-Trading/backend/backend-go/proto/bettingpb";
 
-service BettingService{
+service BettingService {
   rpc PlaceBet(BetRequest) returns (BetResponse);
-
+  rpc CreditAmount(CreditRequest) returns (CreditResponse);
+}
+message CreditRequest {
+  int32 user_id=1;
+  int64 amount=2;
+}
+message CreditResponse {
+  bool success = 1;
+  int64 amount = 2;
 }
 message BetRequest {
   int32 user_id =1;

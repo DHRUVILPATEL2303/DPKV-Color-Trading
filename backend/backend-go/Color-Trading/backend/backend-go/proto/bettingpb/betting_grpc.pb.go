@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BettingService_PlaceBet_FullMethodName = "/betting.BettingService/PlaceBet"
+	BettingService_PlaceBet_FullMethodName     = "/betting.BettingService/PlaceBet"
+	BettingService_CreditAmount_FullMethodName = "/betting.BettingService/CreditAmount"
 )
 
 // BettingServiceClient is the client API for BettingService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BettingServiceClient interface {
 	PlaceBet(ctx context.Context, in *BetRequest, opts ...grpc.CallOption) (*BetResponse, error)
+	CreditAmount(ctx context.Context, in *CreditRequest, opts ...grpc.CallOption) (*CreditResponse, error)
 }
 
 type bettingServiceClient struct {
@@ -47,11 +49,22 @@ func (c *bettingServiceClient) PlaceBet(ctx context.Context, in *BetRequest, opt
 	return out, nil
 }
 
+func (c *bettingServiceClient) CreditAmount(ctx context.Context, in *CreditRequest, opts ...grpc.CallOption) (*CreditResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreditResponse)
+	err := c.cc.Invoke(ctx, BettingService_CreditAmount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BettingServiceServer is the server API for BettingService service.
 // All implementations must embed UnimplementedBettingServiceServer
 // for forward compatibility.
 type BettingServiceServer interface {
 	PlaceBet(context.Context, *BetRequest) (*BetResponse, error)
+	CreditAmount(context.Context, *CreditRequest) (*CreditResponse, error)
 	mustEmbedUnimplementedBettingServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedBettingServiceServer struct{}
 
 func (UnimplementedBettingServiceServer) PlaceBet(context.Context, *BetRequest) (*BetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PlaceBet not implemented")
+}
+func (UnimplementedBettingServiceServer) CreditAmount(context.Context, *CreditRequest) (*CreditResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreditAmount not implemented")
 }
 func (UnimplementedBettingServiceServer) mustEmbedUnimplementedBettingServiceServer() {}
 func (UnimplementedBettingServiceServer) testEmbeddedByValue()                        {}
@@ -104,6 +120,24 @@ func _BettingService_PlaceBet_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BettingService_CreditAmount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreditRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BettingServiceServer).CreditAmount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BettingService_CreditAmount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BettingServiceServer).CreditAmount(ctx, req.(*CreditRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BettingService_ServiceDesc is the grpc.ServiceDesc for BettingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var BettingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PlaceBet",
 			Handler:    _BettingService_PlaceBet_Handler,
+		},
+		{
+			MethodName: "CreditAmount",
+			Handler:    _BettingService_CreditAmount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
