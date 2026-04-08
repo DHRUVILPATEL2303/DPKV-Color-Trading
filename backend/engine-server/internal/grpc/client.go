@@ -6,6 +6,7 @@ import (
 	pb "en/Color-Trading/backend/engine-server/proto/bettingpb"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Client struct {
@@ -14,7 +15,10 @@ type Client struct {
 
 func NewClient() *Client {
 
-	conn, err := grpc.Dial("localhost:8082", grpc.WithInsecure())
+	conn, err := grpc.Dial(
+		"localhost:8082",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
 		log.Fatal("gRPC connection failed:", err)
 	}

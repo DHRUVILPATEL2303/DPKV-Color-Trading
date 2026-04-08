@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	client := grpc.NewClientGrpc()
+	client := grpc.NewEngineClient()
 
 	http.HandleFunc("/ws", ws.HandleWS(client))
 

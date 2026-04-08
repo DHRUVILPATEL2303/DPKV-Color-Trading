@@ -2,10 +2,9 @@ package ws
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
-	pb "ws-server-go/ws-server-go/Color-Trading/backend/ws-server-go/proto/bettingpb"
+	"ws-server-go/ws-server-go/Color-Trading/backend/ws-server-go/proto/enginepb"
 
 	grpcclient "ws-server-go/ws-server-go/internal/grpc"
 
@@ -23,7 +22,7 @@ type Message struct {
 	Color  string `json:"color"`
 }
 
-func HandleWS(client *grpcclient.Client) http.HandlerFunc {
+func HandleWS(client *grpcclient.EngineClient) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -35,40 +34,30 @@ func HandleWS(client *grpcclient.Client) http.HandlerFunc {
 		defer conn.Close()
 
 		for {
-			_, msgBytes, err := conn.ReadMessage()
+			var msg Message
+
+			err := conn.ReadJSON(&msg)
 			if err != nil {
 				log.Println("Read error:", err)
 				return
 			}
 
-			var msg Message
-			err = json.Unmarshal(msgBytes, &msg)
-			if err != nil {
-				return
-			}
-
 			if msg.Type == "PLACE_BET" {
 
-				resp, err := client.Betting.PlaceBet(context.Background(), &pb.BetRequest{
+				resp, err := client.Client.RequestPlaceBet(context.Background(), &enginepb.PlaceBetRequest{
 					UserId: int32(msg.UserID),
-					Amount: int64(int32(msg.Amount)),
+					Amount: int64(msg.Amount),
 					Color:  msg.Color,
 				})
 
 				if err != nil {
-					err := conn.WriteJSON(map[string]string{
+					conn.WriteJSON(map[string]string{
 						"error": err.Error(),
 					})
-					if err != nil {
-						return
-					}
 					continue
 				}
 
-				err = conn.WriteJSON(resp)
-				if err != nil {
-					return
-				}
+				conn.WriteJSON(resp)
 			}
 		}
 	}

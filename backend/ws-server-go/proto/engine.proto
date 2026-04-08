@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package engine;
+
+option go_package= "Color-Trading/backend/ws-server-go/proto/enginepb";
+
+service EngineService {
+  rpc RequestPlaceBet(PlaceBetRequest) returns (PlaceBetResponse);
+}
+
+message PlaceBetRequest {
+  int32 user_id=1;
+  int64 amount=2;
+  string color=3;
+
+}
+message PlaceBetResponse {
+
+  bool success = 1;
+  string message =2;
+}
