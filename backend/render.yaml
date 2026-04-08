@@ -8,41 +8,40 @@ services:
   - type: web
     name: backend-go
     plan: free
-    env: docker
-    dockerfilePath: ./backend-go/Dockerfile
+    env: image
+    image: dhruvil2303/backend-go:latest
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: color-trading-db
           property: connectionString
       - key: PORT
-        value: "8080" # Render public HTTP port
+        value: "8080" 
 
   - type: web
     name: engine-server
     plan: free
-    env: docker
-    dockerfilePath: ./engine-server/Dockerfile
+    env: image
+    image: dhruvil2303/engine-server:latest
     envVars:
       - key: REDIS_URL
-        sync: false # You must set this in the Render Dashboard
+        sync: false 
       - key: BACKEND_GO_GRPC_URL
-        value: "backend-go:8082" # Render internal network
+        value: "backend-go:8082" 
       - key: PORT
-        value: "8080" # Dummy HTTP port for Render health checks
+        value: "8080"
 
   - type: web
     name: ws-server-go
     plan: free
-    env: docker
-    dockerContext: .
-    dockerfilePath: ./ws-server-go/Dockerfile
+    env: image
+    image: dhruvil2303/ws-server-go:latest
     envVars:
       - key: REDIS_URL
-        sync: false # You must set this in the Render Dashboard
+        sync: false
       - key: BACKEND_GO_GRPC_URL
         value: "backend-go:8082"
       - key: ENGINE_SERVER_GRPC_URL
         value: "engine-server:8083"
       - key: PORT
-        value: "8090" # WS HTTP port
+        value: "8090" 
