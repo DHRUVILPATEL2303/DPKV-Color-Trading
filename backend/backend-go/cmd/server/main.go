@@ -50,14 +50,17 @@ func main() {
 	walletRepo := postgres.NewWalletRepository(db)
 	walletService := services.NewWalletService(walletRepo, &userRepo)
 
-	go startGRPCServer(walletService)
+	betsRepo := postgres.NewBetRepository(db)
+	betsService := services.NewBetsService(betsRepo)
+
+	go startGRPCServer(walletService, *betsService)
 
 	router := routes.SetUpRouter(db)
 
 	fmt.Println("HTTP Server running on :8080")
 	router.Run(":8080")
 }
-func startGRPCServer(walletService *services.WalletService) {
+func startGRPCServer(walletService *services.WalletService, service services.BetsService) {
 
 	lis, err := net.Listen("tcp", ":8082")
 	if err != nil {
@@ -66,7 +69,7 @@ func startGRPCServer(walletService *services.WalletService) {
 
 	grpcServer := grpc.NewServer()
 
-	bettingServer := internalgrpc.NewBettingServer(*walletService)
+	bettingServer := internalgrpc.NewBettingServer(*walletService, service)
 
 	pb.RegisterBettingServiceServer(grpcServer, bettingServer)
 

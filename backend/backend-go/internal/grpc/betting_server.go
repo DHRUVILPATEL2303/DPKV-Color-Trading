@@ -11,11 +11,13 @@ import (
 type BettingServer struct {
 	pb.UnimplementedBettingServiceServer
 	walletService services.WalletService
+	betsService   services.BetsService
 }
 
-func NewBettingServer(walletService services.WalletService) *BettingServer {
+func NewBettingServer(walletService services.WalletService, service services.BetsService) *BettingServer {
 	return &BettingServer{
 		walletService: walletService,
+		betsService:   service,
 	}
 }
 
@@ -46,5 +48,17 @@ func (b *BettingServer) CreditAmount(ctx context.Context, req *pb.CreditRequest)
 	return &pb.CreditResponse{
 		Success: true,
 		Amount:  req.Amount,
+	}, nil
+}
+func (b *BettingServer) SaveBet(ctx context.Context, req *pb.SaveBetRequest) (*pb.SaveBetResponse, error) {
+	err := b.betsService.SaveBet(req.UserId, int64(req.RoundNumber), req.Amount, req.Color)
+	if err != nil {
+		return &pb.SaveBetResponse{
+			Success: false,
+		}, err
+	}
+
+	return &pb.SaveBetResponse{
+		Success: true,
 	}, nil
 }

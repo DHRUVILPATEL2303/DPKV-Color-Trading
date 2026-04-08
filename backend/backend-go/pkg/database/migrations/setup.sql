@@ -33,3 +33,20 @@ CREATE TABLE IF NOT EXISTS transactions (
 CREATE INDEX IF NOT EXISTS idx_user_id ON transactions(user_id);
 
 
+CREATE TABLE IF NOT EXISTS rounds(
+    id SERIAL PRIMARY KEY,
+    round_number INT NOT NULL UNIQUE,
+    result TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+
+CREATE TABLE IF NOT EXISTS bets (
+                                    id SERIAL PRIMARY KEY,
+                                    user_id INT,
+                                    round_number INT,
+                                    amount INT,
+                                    color TEXT,
+                                    created_at TIMESTAMP DEFAULT NOW()
+    );

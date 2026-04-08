@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"ws-server-go/ws-server-go/internal/auth"
 
 	enginepb "ws-server-go/ws-server-go/Color-Trading/backend/ws-server-go/proto/enginepb"
 	grpcclient "ws-server-go/ws-server-go/internal/grpc"
@@ -12,12 +13,13 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool { return true },
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 type Message struct {
 	Type   string `json:"type"`
-	UserID int    `json:"user_id"`
 	Amount int    `json:"amount"`
 	Color  string `json:"color"`
 }
@@ -25,6 +27,14 @@ type Message struct {
 func HandleWS(hub *Hub, client *grpcclient.EngineClient) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		token := r.URL.Query().Get("token")
+
+		userID, _, err := auth.ValidateToken(token)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -42,8 +52,7 @@ func HandleWS(hub *Hub, client *grpcclient.EngineClient) http.HandlerFunc {
 		for {
 			var msg Message
 
-			err := conn.ReadJSON(&msg)
-			if err != nil {
+			if err := conn.ReadJSON(&msg); err != nil {
 				log.Println("Read error:", err)
 				return
 			}
@@ -51,7 +60,7 @@ func HandleWS(hub *Hub, client *grpcclient.EngineClient) http.HandlerFunc {
 			if msg.Type == "PLACE_BET" {
 
 				resp, err := client.Client.RequestPlaceBet(context.Background(), &enginepb.PlaceBetRequest{
-					UserId: int32(msg.UserID),
+					UserId: int32(userID),
 					Amount: int64(msg.Amount),
 					Color:  msg.Color,
 				})

@@ -34,7 +34,15 @@ func (e *Engine) PlaceBet(userID int, amount int, color string) error {
 	if err != nil || !resp.Success {
 		return errors.New("wallet deduction failed")
 	}
-
+	_, err = e.api.SaveBet(context.Background(), &pb.SaveBetRequest{
+		UserId:      int32(userID),
+		RoundNumber: int32(round.ID),
+		Amount:      int64(amount),
+		Color:       color,
+	})
+	if err != nil {
+		return errors.New("failed to save betting")
+	}
 	e.store.AddBet(Bet{
 		UserID: userID,
 		Amount: amount,
