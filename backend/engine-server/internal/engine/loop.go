@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"context"
 	"en/internal/publisher"
 	"fmt"
 	"time"
@@ -63,21 +62,7 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 			return
 		}
 
-		for _, bet := range bets {
-
-			if bet.Color == result {
-				winAmount := bet.Amount * 2
-
-				_, err := api.CreditAmount(context.Background(), &pb.CreditRequest{
-					UserId: int32(bet.UserID),
-					Amount: int64(winAmount),
-				})
-
-				if err != nil {
-					fmt.Println("Settlement error:", err)
-				}
-			}
-		}
+		go SettleBetsWorkerPool(bets, result, api)
 
 		store.Clear()
 
