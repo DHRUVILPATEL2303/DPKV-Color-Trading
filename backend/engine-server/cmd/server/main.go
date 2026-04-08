@@ -7,6 +7,8 @@ import (
 	redis2 "en/internal/redis"
 	"log"
 	"net"
+	"net/http"
+	"os"
 
 	pb "en/Color-Trading/backend/engine-server/proto/enginepb"
 
@@ -28,7 +30,15 @@ func main() {
 
 	go startGRPC(engineInstance)
 
-	select {}
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	log.Println("Dummy HTTP server running on :" + port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 func startGRPC(engineInstance *engine.Engine) {
 
