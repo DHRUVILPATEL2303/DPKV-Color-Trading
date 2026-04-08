@@ -12,6 +12,13 @@ import (
 func SetUpRouter(db *sql.DB) *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(func(c *gin.Context) {
+		if c.GetHeader("X-Internal-Secret") != "dpkv123123" {
+			c.AbortWithStatusJSON(403, gin.H{"error": "Forbidden"})
+			return
+		}
+		c.Next()
+	})
 
 	api := r.Group("/api/v1")
 
@@ -22,7 +29,7 @@ func SetUpRouter(db *sql.DB) *gin.Engine {
 	walletRepo := postgres.NewWalletRepository(db)
 	walletService := services.NewWalletService(walletRepo, &userRepo)
 	walletHandler := handlers.NewWalletHandler(walletService)
-	
+
 	betsRepo := postgres.NewBetRepository(db)
 	betsService := services.NewBetsService(betsRepo)
 	betsHandler := handlers.NewBetsHandler(betsService)

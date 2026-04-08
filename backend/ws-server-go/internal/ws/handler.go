@@ -27,6 +27,10 @@ type Message struct {
 func HandleWS(hub *Hub, client *grpcclient.EngineClient) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-Internal-Secret") != "dpkv123123" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 
 		token := r.URL.Query().Get("token")
 
