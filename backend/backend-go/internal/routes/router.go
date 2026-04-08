@@ -34,9 +34,14 @@ func SetUpRouter(db *sql.DB) *gin.Engine {
 	betsService := services.NewBetsService(betsRepo)
 	betsHandler := handlers.NewBetsHandler(betsService)
 
+	transactionRepo := postgres.NewTransactionRepository(db)
+	transactionService := services.NewTransactionService(transactionRepo)
+	transactionHandler := handlers.NewTransactionHandler(transactionService)
+
 	AuthRoutes(api, userHandler)
 	WalletRoutes(api, walletHandler)
 	BetsRoutes(api, betsHandler)
+	TransactionRoutes(api, transactionHandler)
 
 	return r
 }
