@@ -31,3 +31,11 @@ func (s *BetsService) UpdateBet(round int64, winColor string) error {
 
 	return nil
 }
+func (s *BetsService) PlaceBet(userID int, round int, amount int, color string) error {
+
+	err := s.repo.PlaceBet(int32(userID), int64(round), int64(amount), color)
+	if err != nil {
+		return err
+	}
+	return nil
+}

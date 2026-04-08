@@ -1,3 +1,4 @@
+
 CREATE TABLE IF NOT EXISTS users (
                                      id SERIAL PRIMARY KEY,
                                      email TEXT UNIQUE NOT NULL,
@@ -54,3 +55,66 @@ CREATE TABLE IF NOT EXISTS bets (
 ALTER TABLE bets ADD COLUMN IF NOT EXISTS result TEXT;
 
 UPDATE bets SET result = 'PENDING' WHERE result IS NULL;
+
+ALTER TABLE rounds
+    ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'OPEN';
+
+ALTER TABLE rounds ALTER COLUMN result DROP NOT NULL;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'fk_bets_round'
+    ) THEN
+ALTER TABLE bets
+    ADD CONSTRAINT fk_bets_round
+        FOREIGN KEY (round_number) REFERENCES rounds(round_number);
+END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'fk_bets_user'
+    ) THEN
+ALTER TABLE bets
+    ADD CONSTRAINT fk_bets_user
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+END IF;
+END$$;
+
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'check_amount_positive'
+        AND conrelid = 'bets'::regclass
+    ) THEN
+ALTER TABLE bets
+    ADD CONSTRAINT check_amount_positive CHECK (amount > 0);
+END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'check_color'
+        AND conrelid = 'bets'::regclass
+    ) THEN
+ALTER TABLE bets
+    ADD CONSTRAINT check_color CHECK (color IN ('RED', 'GREEN'));
+END IF;
+END$$;
+
+CREATE INDEX IF NOT EXISTS idx_bets_user ON bets(user_id);
+CREATE INDEX IF NOT EXISTS idx_bets_round ON bets(round_number);
+CREATE INDEX IF NOT EXISTS idx_rounds_status ON rounds(status);
+
+
+ALTER TABLE bets DROP CONSTRAINT IF EXISTS unique_user_round;
+
+ALTER TABLE bets ALTER COLUMN result SET DEFAULT 'PENDING';

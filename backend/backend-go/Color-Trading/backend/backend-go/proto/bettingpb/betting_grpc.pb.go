@@ -19,10 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BettingService_PlaceBet_FullMethodName        = "/betting.BettingService/PlaceBet"
-	BettingService_CreditAmount_FullMethodName    = "/betting.BettingService/CreditAmount"
-	BettingService_SaveBet_FullMethodName         = "/betting.BettingService/SaveBet"
-	BettingService_UpdateBetResult_FullMethodName = "/betting.BettingService/UpdateBetResult"
+	BettingService_PlaceBet_FullMethodName          = "/betting.BettingService/PlaceBet"
+	BettingService_CreditAmount_FullMethodName      = "/betting.BettingService/CreditAmount"
+	BettingService_SaveBet_FullMethodName           = "/betting.BettingService/SaveBet"
+	BettingService_UpdateBetResult_FullMethodName   = "/betting.BettingService/UpdateBetResult"
+	BettingService_GetLastRound_FullMethodName      = "/betting.BettingService/GetLastRound"
+	BettingService_CreateRound_FullMethodName       = "/betting.BettingService/CreateRound"
+	BettingService_UpdateRoundStatus_FullMethodName = "/betting.BettingService/UpdateRoundStatus"
+	BettingService_SaveRoundResult_FullMethodName   = "/betting.BettingService/SaveRoundResult"
+	BettingService_RefundRound_FullMethodName       = "/betting.BettingService/RefundRound"
 )
 
 // BettingServiceClient is the client API for BettingService service.
@@ -33,6 +38,11 @@ type BettingServiceClient interface {
 	CreditAmount(ctx context.Context, in *CreditRequest, opts ...grpc.CallOption) (*CreditResponse, error)
 	SaveBet(ctx context.Context, in *SaveBetRequest, opts ...grpc.CallOption) (*SaveBetResponse, error)
 	UpdateBetResult(ctx context.Context, in *UpdateBetRequest, opts ...grpc.CallOption) (*UpdateBetResponse, error)
+	GetLastRound(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RoundResponse, error)
+	CreateRound(ctx context.Context, in *CreateRoundRequest, opts ...grpc.CallOption) (*Empty, error)
+	UpdateRoundStatus(ctx context.Context, in *UpdateRoundStatusRequest, opts ...grpc.CallOption) (*Empty, error)
+	SaveRoundResult(ctx context.Context, in *SaveRoundResultRequest, opts ...grpc.CallOption) (*Empty, error)
+	RefundRound(ctx context.Context, in *RefundRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type bettingServiceClient struct {
@@ -83,6 +93,56 @@ func (c *bettingServiceClient) UpdateBetResult(ctx context.Context, in *UpdateBe
 	return out, nil
 }
 
+func (c *bettingServiceClient) GetLastRound(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RoundResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RoundResponse)
+	err := c.cc.Invoke(ctx, BettingService_GetLastRound_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bettingServiceClient) CreateRound(ctx context.Context, in *CreateRoundRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, BettingService_CreateRound_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bettingServiceClient) UpdateRoundStatus(ctx context.Context, in *UpdateRoundStatusRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, BettingService_UpdateRoundStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bettingServiceClient) SaveRoundResult(ctx context.Context, in *SaveRoundResultRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, BettingService_SaveRoundResult_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bettingServiceClient) RefundRound(ctx context.Context, in *RefundRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, BettingService_RefundRound_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BettingServiceServer is the server API for BettingService service.
 // All implementations must embed UnimplementedBettingServiceServer
 // for forward compatibility.
@@ -91,6 +151,11 @@ type BettingServiceServer interface {
 	CreditAmount(context.Context, *CreditRequest) (*CreditResponse, error)
 	SaveBet(context.Context, *SaveBetRequest) (*SaveBetResponse, error)
 	UpdateBetResult(context.Context, *UpdateBetRequest) (*UpdateBetResponse, error)
+	GetLastRound(context.Context, *Empty) (*RoundResponse, error)
+	CreateRound(context.Context, *CreateRoundRequest) (*Empty, error)
+	UpdateRoundStatus(context.Context, *UpdateRoundStatusRequest) (*Empty, error)
+	SaveRoundResult(context.Context, *SaveRoundResultRequest) (*Empty, error)
+	RefundRound(context.Context, *RefundRequest) (*Empty, error)
 	mustEmbedUnimplementedBettingServiceServer()
 }
 
@@ -112,6 +177,21 @@ func (UnimplementedBettingServiceServer) SaveBet(context.Context, *SaveBetReques
 }
 func (UnimplementedBettingServiceServer) UpdateBetResult(context.Context, *UpdateBetRequest) (*UpdateBetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateBetResult not implemented")
+}
+func (UnimplementedBettingServiceServer) GetLastRound(context.Context, *Empty) (*RoundResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLastRound not implemented")
+}
+func (UnimplementedBettingServiceServer) CreateRound(context.Context, *CreateRoundRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateRound not implemented")
+}
+func (UnimplementedBettingServiceServer) UpdateRoundStatus(context.Context, *UpdateRoundStatusRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateRoundStatus not implemented")
+}
+func (UnimplementedBettingServiceServer) SaveRoundResult(context.Context, *SaveRoundResultRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method SaveRoundResult not implemented")
+}
+func (UnimplementedBettingServiceServer) RefundRound(context.Context, *RefundRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method RefundRound not implemented")
 }
 func (UnimplementedBettingServiceServer) mustEmbedUnimplementedBettingServiceServer() {}
 func (UnimplementedBettingServiceServer) testEmbeddedByValue()                        {}
@@ -206,6 +286,96 @@ func _BettingService_UpdateBetResult_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BettingService_GetLastRound_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BettingServiceServer).GetLastRound(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BettingService_GetLastRound_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BettingServiceServer).GetLastRound(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BettingService_CreateRound_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRoundRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BettingServiceServer).CreateRound(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BettingService_CreateRound_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BettingServiceServer).CreateRound(ctx, req.(*CreateRoundRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BettingService_UpdateRoundStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRoundStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BettingServiceServer).UpdateRoundStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BettingService_UpdateRoundStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BettingServiceServer).UpdateRoundStatus(ctx, req.(*UpdateRoundStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BettingService_SaveRoundResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveRoundResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BettingServiceServer).SaveRoundResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BettingService_SaveRoundResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BettingServiceServer).SaveRoundResult(ctx, req.(*SaveRoundResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BettingService_RefundRound_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefundRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BettingServiceServer).RefundRound(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BettingService_RefundRound_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BettingServiceServer).RefundRound(ctx, req.(*RefundRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BettingService_ServiceDesc is the grpc.ServiceDesc for BettingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +398,26 @@ var BettingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateBetResult",
 			Handler:    _BettingService_UpdateBetResult_Handler,
+		},
+		{
+			MethodName: "GetLastRound",
+			Handler:    _BettingService_GetLastRound_Handler,
+		},
+		{
+			MethodName: "CreateRound",
+			Handler:    _BettingService_CreateRound_Handler,
+		},
+		{
+			MethodName: "UpdateRoundStatus",
+			Handler:    _BettingService_UpdateRoundStatus_Handler,
+		},
+		{
+			MethodName: "SaveRoundResult",
+			Handler:    _BettingService_SaveRoundResult_Handler,
+		},
+		{
+			MethodName: "RefundRound",
+			Handler:    _BettingService_RefundRound_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

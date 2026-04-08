@@ -28,6 +28,7 @@ func (e *Engine) PlaceBet(userID int, amount int, color string) error {
 	resp, err := e.api.PlaceBet(context.Background(), &pb.BetRequest{
 		UserId: int32(userID),
 		Amount: int64(int32(amount)),
+		Round:  int64(round.ID),
 		Color:  color,
 	})
 

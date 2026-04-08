@@ -23,8 +23,8 @@ func main() {
 	publisher := publisher.NewPublisher()
 
 	engineInstance := engine.NewEngine(manager, store, apiClient.Betting)
-
-	go engine.StartGameLoop(manager, store, publisher, redis, apiClient.Betting)
+	startRound := engine.RecoverState(apiClient.Betting)
+	go engine.StartGameLoop(manager, store, publisher, redis, apiClient.Betting, startRound)
 
 	go startGRPC(engineInstance)
 

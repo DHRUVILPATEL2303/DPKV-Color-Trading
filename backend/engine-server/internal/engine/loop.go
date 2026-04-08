@@ -13,21 +13,19 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, rdb *redis.Client, api pb.BettingServiceClient) {
-	var roundID int
+func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, rdb *redis.Client, api pb.BettingServiceClient, startRound int) {
+	var roundID int = startRound
 	ctx := context.Background()
-	val, err := rdb.Get(ctx, "current_round").Int()
-	if err != nil {
-		roundID = 1
-	} else {
-		roundID = val + 1
-	}
 
 	for {
 
 		fmt.Println("Starting round:", roundID)
 
 		m.StartNewRound(roundID)
+
+		api.CreateRound(ctx, &pb.CreateRoundRequest{
+			Round: int32(roundID),
+		})
 
 		publisher.Publish("game_updates", map[string]any{
 			"type":     "ROUND_START",
@@ -46,6 +44,11 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 				fmt.Println("Closing betting")
 				m.CloseBetting()
 
+				api.UpdateRoundStatus(ctx, &pb.UpdateRoundStatusRequest{
+					Round:  int32(roundID),
+					Status: "CLOSED",
+				})
+
 				err := publisher.Publish("game_updates", map[string]any{
 					"type": "BETTING_CLOSED",
 				})
@@ -63,6 +66,12 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 		result := CalculateResult(bets)
 
 		fmt.Println("Result:", result)
+
+		api.SaveRoundResult(ctx, &pb.SaveRoundResultRequest{
+			Round:    int32(roundID),
+			WinColor: result,
+			Status:   "COMPLETED",
+		})
 
 		err := publisher.Publish("game_updates", map[string]any{
 			"type":     "RESULT",

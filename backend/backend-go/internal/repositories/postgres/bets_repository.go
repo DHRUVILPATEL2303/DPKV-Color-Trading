@@ -3,6 +3,7 @@ package postgres
 import (
 	"Color-Trading/backend/backend-go/internal/models"
 	"database/sql"
+	"errors"
 )
 
 type BetRepository struct {
@@ -18,6 +19,7 @@ type IBetRepository interface {
 	SaveBet(userId int32, round int64, amount int64, color string) error
 	GetAllBetsHistory(userId int32) ([]*models.Bet, error)
 	UpdateBet(round int64, winColor string) error
+	PlaceBet(userId int32, round int64, amount int64, color string) error
 }
 
 func (b *BetRepository) SaveBet(userId int32, round int64, amount int64, color string) error {
@@ -88,4 +90,55 @@ func (b *BetRepository) UpdateResult(round int, winningColor string) error {
 	`, round, winningColor)
 
 	return err
+}
+func (s *BetRepository) PlaceBet(userID int32, round int64, amount int64, color string) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	var balance int
+	err = tx.QueryRow("SELECT balance FROM users WHERE id=$1", userID).Scan(&balance)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if int(balance) < int(amount) {
+		tx.Rollback()
+		return errors.New("insufficient balance")
+	}
+
+	_, err = tx.Exec(`
+	INSERT INTO bets (user_id, round_number, amount, color)
+	VALUES ($1,$2,$3,$4)
+	`, userID, round, amount, color)
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec(`
+	UPDATE users
+	SET balance = balance - $1
+	WHERE id = $2
+	`, amount, userID)
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec(`
+	INSERT INTO transactions (user_id, amount, type)
+	VALUES ($1,$2,'DEBIT')
+	`, userID, amount)
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }

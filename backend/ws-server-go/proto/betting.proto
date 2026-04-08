@@ -5,13 +5,44 @@ option go_package = "Color-Trading/backend/ws-server-go/proto/bettingpb";
 
 
 
+
 service BettingService {
   rpc PlaceBet(BetRequest) returns (BetResponse);
   rpc CreditAmount(CreditRequest) returns (CreditResponse);
   rpc SaveBet(SaveBetRequest) returns (SaveBetResponse);
   rpc UpdateBetResult(UpdateBetRequest) returns (UpdateBetResponse);
+  rpc GetLastRound(Empty) returns (RoundResponse);
+  rpc CreateRound(CreateRoundRequest) returns (Empty);
+  rpc UpdateRoundStatus(UpdateRoundStatusRequest) returns (Empty);
+  rpc SaveRoundResult(SaveRoundResultRequest) returns (Empty);
+  rpc RefundRound(RefundRequest) returns (Empty);
 }
+message Empty {
 
+}
+message RoundResponse {
+  int32 round = 1;
+  string status=2;
+
+}
+message CreateRoundRequest {
+  int32 round=1;
+
+}
+message UpdateRoundStatusRequest {
+  int32 round=1;
+  string status =2;
+}
+message SaveRoundResultRequest {
+
+  int32 round=1;
+  string status =2;
+  string winColor =3;
+}
+message RefundRequest {
+  int32 round = 1;
+
+}
 message UpdateBetRequest {
   int64 round = 1;
   string color = 2;
@@ -39,11 +70,11 @@ message CreditResponse {
   int64 amount = 2;
 }
 message BetRequest {
-  int32 user_id =1 ;
-  int64 amount =2 ;
-  string color =3;
+  int32 user_id =1;
+  int64 round=2;
+  int64 amount = 3;
+  string color = 4;
 }
-
 message BetResponse {
   bool success =1 ;
   string message =2 ;
