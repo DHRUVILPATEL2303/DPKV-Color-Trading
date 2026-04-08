@@ -21,6 +21,102 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type UpdateBetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Round         int64                  `protobuf:"varint,1,opt,name=round,proto3" json:"round,omitempty"`
+	Color         string                 `protobuf:"bytes,2,opt,name=color,proto3" json:"color,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateBetRequest) Reset() {
+	*x = UpdateBetRequest{}
+	mi := &file_proto_betting_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateBetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateBetRequest) ProtoMessage() {}
+
+func (x *UpdateBetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_betting_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateBetRequest.ProtoReflect.Descriptor instead.
+func (*UpdateBetRequest) Descriptor() ([]byte, []int) {
+	return file_proto_betting_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *UpdateBetRequest) GetRound() int64 {
+	if x != nil {
+		return x.Round
+	}
+	return 0
+}
+
+func (x *UpdateBetRequest) GetColor() string {
+	if x != nil {
+		return x.Color
+	}
+	return ""
+}
+
+type UpdateBetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateBetResponse) Reset() {
+	*x = UpdateBetResponse{}
+	mi := &file_proto_betting_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateBetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateBetResponse) ProtoMessage() {}
+
+func (x *UpdateBetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_betting_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateBetResponse.ProtoReflect.Descriptor instead.
+func (*UpdateBetResponse) Descriptor() ([]byte, []int) {
+	return file_proto_betting_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *UpdateBetResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 type SaveBetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int32                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -33,7 +129,7 @@ type SaveBetRequest struct {
 
 func (x *SaveBetRequest) Reset() {
 	*x = SaveBetRequest{}
-	mi := &file_proto_betting_proto_msgTypes[0]
+	mi := &file_proto_betting_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +141,7 @@ func (x *SaveBetRequest) String() string {
 func (*SaveBetRequest) ProtoMessage() {}
 
 func (x *SaveBetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_betting_proto_msgTypes[0]
+	mi := &file_proto_betting_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +154,7 @@ func (x *SaveBetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveBetRequest.ProtoReflect.Descriptor instead.
 func (*SaveBetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_betting_proto_rawDescGZIP(), []int{0}
+	return file_proto_betting_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SaveBetRequest) GetUserId() int32 {
@@ -98,7 +194,7 @@ type SaveBetResponse struct {
 
 func (x *SaveBetResponse) Reset() {
 	*x = SaveBetResponse{}
-	mi := &file_proto_betting_proto_msgTypes[1]
+	mi := &file_proto_betting_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -110,7 +206,7 @@ func (x *SaveBetResponse) String() string {
 func (*SaveBetResponse) ProtoMessage() {}
 
 func (x *SaveBetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_betting_proto_msgTypes[1]
+	mi := &file_proto_betting_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -123,7 +219,7 @@ func (x *SaveBetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveBetResponse.ProtoReflect.Descriptor instead.
 func (*SaveBetResponse) Descriptor() ([]byte, []int) {
-	return file_proto_betting_proto_rawDescGZIP(), []int{1}
+	return file_proto_betting_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SaveBetResponse) GetSuccess() bool {
@@ -143,7 +239,7 @@ type CreditRequest struct {
 
 func (x *CreditRequest) Reset() {
 	*x = CreditRequest{}
-	mi := &file_proto_betting_proto_msgTypes[2]
+	mi := &file_proto_betting_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -155,7 +251,7 @@ func (x *CreditRequest) String() string {
 func (*CreditRequest) ProtoMessage() {}
 
 func (x *CreditRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_betting_proto_msgTypes[2]
+	mi := &file_proto_betting_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -168,7 +264,7 @@ func (x *CreditRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreditRequest.ProtoReflect.Descriptor instead.
 func (*CreditRequest) Descriptor() ([]byte, []int) {
-	return file_proto_betting_proto_rawDescGZIP(), []int{2}
+	return file_proto_betting_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CreditRequest) GetUserId() int32 {
@@ -195,7 +291,7 @@ type CreditResponse struct {
 
 func (x *CreditResponse) Reset() {
 	*x = CreditResponse{}
-	mi := &file_proto_betting_proto_msgTypes[3]
+	mi := &file_proto_betting_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -207,7 +303,7 @@ func (x *CreditResponse) String() string {
 func (*CreditResponse) ProtoMessage() {}
 
 func (x *CreditResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_betting_proto_msgTypes[3]
+	mi := &file_proto_betting_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -220,7 +316,7 @@ func (x *CreditResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreditResponse.ProtoReflect.Descriptor instead.
 func (*CreditResponse) Descriptor() ([]byte, []int) {
-	return file_proto_betting_proto_rawDescGZIP(), []int{3}
+	return file_proto_betting_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreditResponse) GetSuccess() bool {
@@ -248,7 +344,7 @@ type BetRequest struct {
 
 func (x *BetRequest) Reset() {
 	*x = BetRequest{}
-	mi := &file_proto_betting_proto_msgTypes[4]
+	mi := &file_proto_betting_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -260,7 +356,7 @@ func (x *BetRequest) String() string {
 func (*BetRequest) ProtoMessage() {}
 
 func (x *BetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_betting_proto_msgTypes[4]
+	mi := &file_proto_betting_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -273,7 +369,7 @@ func (x *BetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BetRequest.ProtoReflect.Descriptor instead.
 func (*BetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_betting_proto_rawDescGZIP(), []int{4}
+	return file_proto_betting_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *BetRequest) GetUserId() int32 {
@@ -307,7 +403,7 @@ type BetResponse struct {
 
 func (x *BetResponse) Reset() {
 	*x = BetResponse{}
-	mi := &file_proto_betting_proto_msgTypes[5]
+	mi := &file_proto_betting_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -319,7 +415,7 @@ func (x *BetResponse) String() string {
 func (*BetResponse) ProtoMessage() {}
 
 func (x *BetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_betting_proto_msgTypes[5]
+	mi := &file_proto_betting_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -332,7 +428,7 @@ func (x *BetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BetResponse.ProtoReflect.Descriptor instead.
 func (*BetResponse) Descriptor() ([]byte, []int) {
-	return file_proto_betting_proto_rawDescGZIP(), []int{5}
+	return file_proto_betting_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *BetResponse) GetSuccess() bool {
@@ -353,7 +449,12 @@ var File_proto_betting_proto protoreflect.FileDescriptor
 
 const file_proto_betting_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/betting.proto\x12\abetting\"z\n" +
+	"\x13proto/betting.proto\x12\abetting\">\n" +
+	"\x10UpdateBetRequest\x12\x14\n" +
+	"\x05round\x18\x01 \x01(\x03R\x05round\x12\x14\n" +
+	"\x05color\x18\x02 \x01(\tR\x05color\"-\n" +
+	"\x11UpdateBetResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"z\n" +
 	"\x0eSaveBetRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x05R\x06userId\x12!\n" +
 	"\fround_number\x18\x02 \x01(\x05R\vroundNumber\x12\x16\n" +
@@ -374,11 +475,12 @@ const file_proto_betting_proto_rawDesc = "" +
 	"\x05color\x18\x03 \x01(\tR\x05color\"A\n" +
 	"\vBetResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xc6\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x90\x02\n" +
 	"\x0eBettingService\x125\n" +
 	"\bPlaceBet\x12\x13.betting.BetRequest\x1a\x14.betting.BetResponse\x12?\n" +
 	"\fCreditAmount\x12\x16.betting.CreditRequest\x1a\x17.betting.CreditResponse\x12<\n" +
-	"\aSaveBet\x12\x17.betting.SaveBetRequest\x1a\x18.betting.SaveBetResponseB4Z2Color-Trading/backend/ws-server-go/proto/bettingpbb\x06proto3"
+	"\aSaveBet\x12\x17.betting.SaveBetRequest\x1a\x18.betting.SaveBetResponse\x12H\n" +
+	"\x0fUpdateBetResult\x12\x19.betting.UpdateBetRequest\x1a\x1a.betting.UpdateBetResponseB4Z2Color-Trading/backend/ws-server-go/proto/bettingpbb\x06proto3"
 
 var (
 	file_proto_betting_proto_rawDescOnce sync.Once
@@ -392,24 +494,28 @@ func file_proto_betting_proto_rawDescGZIP() []byte {
 	return file_proto_betting_proto_rawDescData
 }
 
-var file_proto_betting_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_proto_betting_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_proto_betting_proto_goTypes = []any{
-	(*SaveBetRequest)(nil),  // 0: betting.SaveBetRequest
-	(*SaveBetResponse)(nil), // 1: betting.SaveBetResponse
-	(*CreditRequest)(nil),   // 2: betting.CreditRequest
-	(*CreditResponse)(nil),  // 3: betting.CreditResponse
-	(*BetRequest)(nil),      // 4: betting.BetRequest
-	(*BetResponse)(nil),     // 5: betting.BetResponse
+	(*UpdateBetRequest)(nil),  // 0: betting.UpdateBetRequest
+	(*UpdateBetResponse)(nil), // 1: betting.UpdateBetResponse
+	(*SaveBetRequest)(nil),    // 2: betting.SaveBetRequest
+	(*SaveBetResponse)(nil),   // 3: betting.SaveBetResponse
+	(*CreditRequest)(nil),     // 4: betting.CreditRequest
+	(*CreditResponse)(nil),    // 5: betting.CreditResponse
+	(*BetRequest)(nil),        // 6: betting.BetRequest
+	(*BetResponse)(nil),       // 7: betting.BetResponse
 }
 var file_proto_betting_proto_depIdxs = []int32{
-	4, // 0: betting.BettingService.PlaceBet:input_type -> betting.BetRequest
-	2, // 1: betting.BettingService.CreditAmount:input_type -> betting.CreditRequest
-	0, // 2: betting.BettingService.SaveBet:input_type -> betting.SaveBetRequest
-	5, // 3: betting.BettingService.PlaceBet:output_type -> betting.BetResponse
-	3, // 4: betting.BettingService.CreditAmount:output_type -> betting.CreditResponse
-	1, // 5: betting.BettingService.SaveBet:output_type -> betting.SaveBetResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	6, // 0: betting.BettingService.PlaceBet:input_type -> betting.BetRequest
+	4, // 1: betting.BettingService.CreditAmount:input_type -> betting.CreditRequest
+	2, // 2: betting.BettingService.SaveBet:input_type -> betting.SaveBetRequest
+	0, // 3: betting.BettingService.UpdateBetResult:input_type -> betting.UpdateBetRequest
+	7, // 4: betting.BettingService.PlaceBet:output_type -> betting.BetResponse
+	5, // 5: betting.BettingService.CreditAmount:output_type -> betting.CreditResponse
+	3, // 6: betting.BettingService.SaveBet:output_type -> betting.SaveBetResponse
+	1, // 7: betting.BettingService.UpdateBetResult:output_type -> betting.UpdateBetResponse
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -426,7 +532,7 @@ func file_proto_betting_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_betting_proto_rawDesc), len(file_proto_betting_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

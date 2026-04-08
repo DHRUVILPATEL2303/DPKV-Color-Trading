@@ -1,8 +1,10 @@
 package engine
 
 import (
+	"context"
 	"en/internal/publisher"
 	"fmt"
+	"log"
 	"time"
 
 	pb "en/Color-Trading/backend/engine-server/proto/bettingpb"
@@ -62,6 +64,14 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 			return
 		}
 
+		betResult, err := api.UpdateBetResult(context.Background(), &pb.UpdateBetRequest{
+			Round: int64(roundID),
+			Color: result,
+		})
+		if err != nil || !betResult.Success {
+			log.Println(err)
+			log.Println("for round %s betting result for updaterequest %s", roundID, betResult)
+		}
 		go SettleBetsWorkerPool(bets, result, api)
 
 		store.Clear()

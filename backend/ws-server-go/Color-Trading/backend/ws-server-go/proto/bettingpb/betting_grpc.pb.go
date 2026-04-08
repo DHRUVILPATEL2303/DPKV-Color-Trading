@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BettingService_PlaceBet_FullMethodName     = "/betting.BettingService/PlaceBet"
-	BettingService_CreditAmount_FullMethodName = "/betting.BettingService/CreditAmount"
-	BettingService_SaveBet_FullMethodName      = "/betting.BettingService/SaveBet"
+	BettingService_PlaceBet_FullMethodName        = "/betting.BettingService/PlaceBet"
+	BettingService_CreditAmount_FullMethodName    = "/betting.BettingService/CreditAmount"
+	BettingService_SaveBet_FullMethodName         = "/betting.BettingService/SaveBet"
+	BettingService_UpdateBetResult_FullMethodName = "/betting.BettingService/UpdateBetResult"
 )
 
 // BettingServiceClient is the client API for BettingService service.
@@ -31,6 +32,7 @@ type BettingServiceClient interface {
 	PlaceBet(ctx context.Context, in *BetRequest, opts ...grpc.CallOption) (*BetResponse, error)
 	CreditAmount(ctx context.Context, in *CreditRequest, opts ...grpc.CallOption) (*CreditResponse, error)
 	SaveBet(ctx context.Context, in *SaveBetRequest, opts ...grpc.CallOption) (*SaveBetResponse, error)
+	UpdateBetResult(ctx context.Context, in *UpdateBetRequest, opts ...grpc.CallOption) (*UpdateBetResponse, error)
 }
 
 type bettingServiceClient struct {
@@ -71,6 +73,16 @@ func (c *bettingServiceClient) SaveBet(ctx context.Context, in *SaveBetRequest, 
 	return out, nil
 }
 
+func (c *bettingServiceClient) UpdateBetResult(ctx context.Context, in *UpdateBetRequest, opts ...grpc.CallOption) (*UpdateBetResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateBetResponse)
+	err := c.cc.Invoke(ctx, BettingService_UpdateBetResult_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BettingServiceServer is the server API for BettingService service.
 // All implementations must embed UnimplementedBettingServiceServer
 // for forward compatibility.
@@ -78,6 +90,7 @@ type BettingServiceServer interface {
 	PlaceBet(context.Context, *BetRequest) (*BetResponse, error)
 	CreditAmount(context.Context, *CreditRequest) (*CreditResponse, error)
 	SaveBet(context.Context, *SaveBetRequest) (*SaveBetResponse, error)
+	UpdateBetResult(context.Context, *UpdateBetRequest) (*UpdateBetResponse, error)
 	mustEmbedUnimplementedBettingServiceServer()
 }
 
@@ -96,6 +109,9 @@ func (UnimplementedBettingServiceServer) CreditAmount(context.Context, *CreditRe
 }
 func (UnimplementedBettingServiceServer) SaveBet(context.Context, *SaveBetRequest) (*SaveBetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SaveBet not implemented")
+}
+func (UnimplementedBettingServiceServer) UpdateBetResult(context.Context, *UpdateBetRequest) (*UpdateBetResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateBetResult not implemented")
 }
 func (UnimplementedBettingServiceServer) mustEmbedUnimplementedBettingServiceServer() {}
 func (UnimplementedBettingServiceServer) testEmbeddedByValue()                        {}
@@ -172,6 +188,24 @@ func _BettingService_SaveBet_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BettingService_UpdateBetResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateBetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BettingServiceServer).UpdateBetResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BettingService_UpdateBetResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BettingServiceServer).UpdateBetResult(ctx, req.(*UpdateBetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BettingService_ServiceDesc is the grpc.ServiceDesc for BettingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,6 +224,10 @@ var BettingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SaveBet",
 			Handler:    _BettingService_SaveBet_Handler,
+		},
+		{
+			MethodName: "UpdateBetResult",
+			Handler:    _BettingService_UpdateBetResult_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

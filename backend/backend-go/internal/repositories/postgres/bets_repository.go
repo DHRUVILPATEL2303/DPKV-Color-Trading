@@ -17,10 +17,11 @@ func NewBetRepository(db *sql.DB) *BetRepository {
 type IBetRepository interface {
 	SaveBet(userId int32, round int64, amount int64, color string) error
 	GetAllBetsHistory(userId int32) ([]*models.Bet, error)
+	UpdateBet(round int64, winColor string) error
 }
 
 func (b *BetRepository) SaveBet(userId int32, round int64, amount int64, color string) error {
-	_, err := b.db.Exec("INSERT INTO bets (user_id,round_number,amount,color) VALUES ($1,$2,$3,$4)", userId, round, amount, color)
+	_, err := b.db.Exec("INSERT INTO bets (user_id,round_number,amount,color,result) VALUES ($1,$2,$3,$4,$5)", userId, round, amount, color, "PENDING")
 	if err != nil {
 		return err
 	}
@@ -30,7 +31,7 @@ func (b *BetRepository) SaveBet(userId int32, round int64, amount int64, color s
 func (b *BetRepository) GetAllBetsHistory(userId int32) ([]*models.Bet, error) {
 
 	rows, err := b.db.Query(`
-		SELECT round_number, amount, color, created_at
+		SELECT round_number, amount, color, result,created_at
 		FROM bets
 		WHERE user_id = $1
 		ORDER BY created_at DESC
@@ -51,6 +52,7 @@ func (b *BetRepository) GetAllBetsHistory(userId int32) ([]*models.Bet, error) {
 			&bet.RoundNumber,
 			&bet.Amount,
 			&bet.Color,
+			&bet.Result,
 			&bet.CreatedAt,
 		)
 		if err != nil {
@@ -65,4 +67,25 @@ func (b *BetRepository) GetAllBetsHistory(userId int32) ([]*models.Bet, error) {
 	}
 
 	return bets, nil
+}
+
+func (b *BetRepository) UpdateResult(round int, winningColor string) error {
+
+	_, err := b.db.Exec(`
+	UPDATE bets
+	SET result = 'WIN'
+	WHERE round_number = $1 AND color = $2
+	`, round, winningColor)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = b.db.Exec(`
+	UPDATE bets
+	SET result = 'LOSS'
+	WHERE round_number = $1 AND color != $2
+	`, round, winningColor)
+
+	return err
 }

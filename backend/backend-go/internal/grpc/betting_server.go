@@ -62,3 +62,15 @@ func (b *BettingServer) SaveBet(ctx context.Context, req *pb.SaveBetRequest) (*p
 		Success: true,
 	}, nil
 }
+func (b *BettingServer) UpdateBetResult(ctx context.Context, req *pb.UpdateBetRequest) (*pb.UpdateBetResponse, error) {
+	err := b.betsService.UpdateBet(req.Round, req.Color)
+	if err != nil {
+		return &pb.UpdateBetResponse{
+			Success: false,
+		}, err
+	}
+
+	return &pb.UpdateBetResponse{
+		Success: true,
+	}, nil
+}

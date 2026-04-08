@@ -7,6 +7,15 @@ service BettingService {
   rpc PlaceBet(BetRequest) returns (BetResponse);
   rpc CreditAmount(CreditRequest) returns (CreditResponse);
   rpc SaveBet(SaveBetRequest) returns (SaveBetResponse);
+  rpc UpdateBetResult(UpdateBetRequest) returns (UpdateBetResponse);
+}
+
+message UpdateBetRequest {
+  int64 round = 1;
+  string color = 2;
+}
+message UpdateBetResponse{
+  bool success=1;
 }
 
 message SaveBetRequest {

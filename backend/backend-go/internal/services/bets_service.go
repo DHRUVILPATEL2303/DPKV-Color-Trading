@@ -23,3 +23,11 @@ func (s *BetsService) SaveBet(userId int32, round int64, amount int64, color str
 func (s *BetsService) GetAllBetsHistory(userId int32) ([]*models.Bet, error) {
 	return s.repo.GetAllBetsHistory(userId)
 }
+func (s *BetsService) UpdateBet(round int64, winColor string) error {
+	err := s.repo.UpdateResult(int(round), winColor)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -50,3 +50,7 @@ CREATE TABLE IF NOT EXISTS bets (
                                     color TEXT,
                                     created_at TIMESTAMP DEFAULT NOW()
     );
+
+ALTER TABLE bets ADD COLUMN IF NOT EXISTS result TEXT;
+
+UPDATE bets SET result = 'PENDING' WHERE result IS NULL;
