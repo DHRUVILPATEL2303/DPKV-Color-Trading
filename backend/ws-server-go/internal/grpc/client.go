@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"log"
+	"os"
 
 	pb "ws-server-go/ws-server-go/Color-Trading/backend/ws-server-go/proto/bettingpb"
 
@@ -14,7 +15,12 @@ type Client struct {
 
 func NewClientGrpc() *Client {
 
-	conn, err := grpc.Dial("localhost:8082", grpc.WithInsecure())
+	addr := os.Getenv("BACKEND_GO_GRPC_URL")
+	if addr == "" {
+		addr = "localhost:8082"
+	}
+
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("Failed to connect to gRPC:", err)
 	}

@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: color_trading
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend-go:
+    build:
+      context: ./backend-go
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgres://postgres:password@postgres:5432/color_trading?sslmode=disable"
+    ports:
+      - "8080:8080"
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+
+  engine-server:
+    build:
+      context: ./engine-server
+      dockerfile: Dockerfile
+    environment:
+      REDIS_URL: "redis:6379"
+      BACKEND_GO_GRPC_URL: "backend-go:8082"
+    ports:
+      - "8083:8083"
+    depends_on:
+      - redis
+      - backend-go
+    restart: always
+
+  ws-server-go:
+    build:
+      context: .
+      dockerfile: ws-server-go/Dockerfile
+    environment:
+      REDIS_URL: "redis:6379"
+      BACKEND_GO_GRPC_URL: "backend-go:8082"
+      ENGINE_SERVER_GRPC_URL: "engine-server:8083"
+    ports:
+      - "8090:8090"
+    depends_on:
+      - redis
+      - engine-server
+      - backend-go
+    restart: always
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    depends_on:
+      - backend-go
+      - ws-server-go
+    restart: always
+
+volumes:
+  postgres_data:

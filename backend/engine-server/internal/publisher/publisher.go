@@ -3,6 +3,7 @@ package publisher
 import (
 	"context"
 	"encoding/json"
+	"os"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -12,8 +13,12 @@ type Publisher struct {
 }
 
 func NewPublisher() *Publisher {
+	addr := os.Getenv("REDIS_URL")
+	if addr == "" {
+		addr = "localhost:6379"
+	}
 	rdb := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: addr,
 	})
 
 	return &Publisher{rdb}

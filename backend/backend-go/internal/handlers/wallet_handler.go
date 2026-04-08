@@ -1,6 +1,5 @@
 package handlers
 
-import "C"
 import (
 	"Color-Trading/backend/backend-go/internal/services"
 	"fmt"

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"log"
+	"os"
 
 	pb "ws-server-go/ws-server-go/Color-Trading/backend/ws-server-go/proto/enginepb"
 
@@ -14,7 +15,12 @@ type EngineClient struct {
 
 func NewEngineClient() *EngineClient {
 
-	conn, err := grpc.Dial("localhost:8083", grpc.WithInsecure())
+	addr := os.Getenv("ENGINE_SERVER_GRPC_URL")
+	if addr == "" {
+		addr = "localhost:8083"
+	}
+
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("Failed to connect to engine:", err)
 	}

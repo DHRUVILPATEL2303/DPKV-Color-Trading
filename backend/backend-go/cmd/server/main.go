@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -20,7 +21,10 @@ import (
 )
 
 func InitPostgres() *sql.DB {
-	connStr := "postgres://postgres:password@localhost:5432/color_trading?sslmode=disable"
+	connStr := os.Getenv("DATABASE_URL")
+	if connStr == "" {
+		connStr = "postgres://postgres:password@localhost:5432/color_trading?sslmode=disable"
+	}
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"log"
+	"os"
 
 	pb "en/Color-Trading/backend/engine-server/proto/bettingpb"
 
@@ -14,9 +15,13 @@ type Client struct {
 }
 
 func NewClient() *Client {
+	addr := os.Getenv("BACKEND_GO_GRPC_URL")
+	if addr == "" {
+		addr = "localhost:8082"
+	}
 
 	conn, err := grpc.Dial(
-		"localhost:8082",
+		addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
