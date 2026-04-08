@@ -1,31 +1,25 @@
-databases:
-  - name: color-trading-db
-    databaseName: color_trading
-    user: postgres
-    plan: free
-
 services:
   - type: web
     name: backend-go
     plan: free
-    env: image
-    image: dhruvil2303/backend-go:latest
+    env: docker
+    rootDir: backend
+    dockerfilePath: backend-go/Dockerfile
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: color-trading-db
-          property: connectionString
+        value: "postgresql://dpkv_trading_user:ELOzxm7VeO8JWkYhCLW0LxZ4dNcVaPME@dpg-d7b9e3ea2pns73be1rfg-a/dpkv_trading"
       - key: PORT
         value: "8080" 
 
   - type: web
     name: engine-server
     plan: free
-    env: image
-    image: dhruvil2303/engine-server:latest
+    env: docker
+    rootDir: backend
+    dockerfilePath: engine-server/Dockerfile
     envVars:
       - key: REDIS_URL
-        sync: false 
+        value: "rediss://default:gQAAAAAAAXHFAAIncDIxZDRkNTNjOTIyMmU0Mzg2YmI3Y2Y2ZTNlZWM5MTI1OHAyOTQ2NjE@open-horse-94661.upstash.io:6379"
       - key: BACKEND_GO_GRPC_URL
         value: "backend-go:8082" 
       - key: PORT
@@ -34,11 +28,13 @@ services:
   - type: web
     name: ws-server-go
     plan: free
-    env: image
-    image: dhruvil2303/ws-server-go:latest
+    env: docker
+    rootDir: backend
+    dockerContext: .
+    dockerfilePath: ws-server-go/Dockerfile
     envVars:
       - key: REDIS_URL
-        sync: false
+        value: "rediss://default:gQAAAAAAAXHFAAIncDIxZDRkNTNjOTIyMmU0Mzg2YmI3Y2Y2ZTNlZWM5MTI1OHAyOTQ2NjE@open-horse-94661.upstash.io:6379"
       - key: BACKEND_GO_GRPC_URL
         value: "backend-go:8082"
       - key: ENGINE_SERVER_GRPC_URL
