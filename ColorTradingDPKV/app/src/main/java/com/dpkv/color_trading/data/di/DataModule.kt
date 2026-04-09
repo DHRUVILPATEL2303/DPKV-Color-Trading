@@ -3,6 +3,7 @@ package com.dpkv.color_trading.data.di
 import android.content.Context
 import com.dpkv.color_trading.common.BASE_URL
 import com.dpkv.color_trading.data.remote.AuthApi
+import com.dpkv.color_trading.data.websocket.WebSocketManager
 import com.dpkv.color_trading.datastore.local.TokenManager
 import com.dpkv.color_trading.network.AuthInterceptor
 import com.dpkv.color_trading.network.SessionManager
@@ -91,4 +92,16 @@ object DataModule {
     fun provideAuthApi(
         retrofit: Retrofit
     ): AuthApi = retrofit.create(AuthApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideWebsocketManager(
+        tokenManager: TokenManager,
+        okHttpClient: OkHttpClient
+    ): WebSocketManager {
+        return WebSocketManager(
+            tokenManager,
+            okHttpClient
+        )
+    }
 }
