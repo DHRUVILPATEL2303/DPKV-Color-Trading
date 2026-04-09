@@ -23,8 +23,11 @@ class GameViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(GameState())
     val uiState = _uiState.asStateFlow()
 
-    private val _betError = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private val _betError = MutableSharedFlow<String>(extraBufferCapacity = 20)
     val betError = _betError.asSharedFlow()
+
+    private val _roundResultEvent = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val roundResultEvent = _roundResultEvent.asSharedFlow()
 
     init {
         observeWs()
@@ -58,6 +61,7 @@ class GameViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(
                             result = event.data.result
                         )
+                        _roundResultEvent.tryEmit(event.data.result)
                     }
 
                     is WsEvent.RoundStart -> {

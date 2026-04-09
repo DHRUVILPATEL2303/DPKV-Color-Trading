@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ColorTradingDPKVTheme {
                 Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    AppNavigation(sessionManager =sessionManager)
+                    AppNavigation(sessionManager =sessionManager, tokenManager = tokenManager)
                 }
             }
         }

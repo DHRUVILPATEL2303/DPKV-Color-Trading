@@ -12,6 +12,12 @@ sealed class Routes {
 
     @Serializable
     object GameScreen
+
+    @Serializable
+    object AccountScreen
+
+    @Serializable
+    object HistoryScreen
 }
 
 sealed class SubNavigation {

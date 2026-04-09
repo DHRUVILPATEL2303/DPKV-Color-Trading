@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
@@ -27,6 +29,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -53,12 +56,18 @@ import com.dpkv.color_trading.presentation.viewmodels.roundViewModel.RoundViewMo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+import kotlinx.coroutines.coroutineScope
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: RoundViewModel = hiltViewModel()) {
+fun GameScreenUI(
+    viewModel: GameViewModel = hiltViewModel(),
+    roundViewModel: RoundViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState
+) {
     val state = viewModel.uiState.collectAsState().value
     val roundState = roundViewModel.state.collectAsState().value
-    val snackbarHostState = remember { SnackbarHostState() }
+    // val snackbarHostState = remember { SnackbarHostState() } // Removed local state
     val coroutineScope = rememberCoroutineScope()
 
     var selectedAmount by remember { mutableStateOf("10") }
@@ -66,19 +75,16 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: Roun
     var resultToShow by remember { mutableStateOf("") }
     var showResultDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(state.result) {
-        if (state.result.isNotEmpty()) {
-            resultToShow = state.result
-            showResultDialog = true
-        }
-    }
-
-    LaunchedEffect(state.result) {
-        if (state.result.isNotEmpty()) {
-            roundViewModel.onNewResult(
-                roundId = state.roundId,
-                result = state.result
-            )
+    LaunchedEffect(Unit) {
+        viewModel.roundResultEvent.collect { resultMsg ->
+            if (resultMsg.isNotEmpty()) {
+                resultToShow = resultMsg
+                showResultDialog = true
+                roundViewModel.onNewResult(
+                    roundId = viewModel.uiState.value.roundId,
+                    result = resultMsg
+                )
+            }
         }
     }
 
@@ -91,7 +97,16 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: Roun
 
     LaunchedEffect(Unit) {
         viewModel.betError.collect { errorMsg ->
-            snackbarHostState.showSnackbar(errorMsg)
+            coroutineScope {
+                val job = launch {
+                    snackbarHostState.showSnackbar(
+                        message = errorMsg,
+                        duration = SnackbarDuration.Indefinite
+                    )
+                }
+                delay(1000)
+                job.cancel()
+            }
         }
     }
 
@@ -139,7 +154,6 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: Roun
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Color Trading") },
@@ -161,6 +175,7 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: Roun
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -175,22 +190,35 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: Roun
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "Round: #${state.roundId}", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "${state.secondsLeft}s",
-                        style = MaterialTheme.typography.displayLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = if (state.secondsLeft <= 5) Color(0xFFE53935) else MaterialTheme.colorScheme.onSurface
+                    if (state.roundId == 0) {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(16.dp)
                         )
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = if (state.isBettingOpen) "Betting is Open" else "Betting is Closed",
-                        color = if (state.isBettingOpen) Color(0xFF4CAF50) else Color(0xFFE53935),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
-                    )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Connecting...",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        Text(text = "Round: #${state.roundId}", style = MaterialTheme.typography.titleMedium)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "${state.secondsLeft}s",
+                            style = MaterialTheme.typography.displayLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = if (state.secondsLeft <= 5) Color(0xFFE53935) else MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = if (state.isBettingOpen) "Betting is Open" else "Betting is Closed",
+                            color = if (state.isBettingOpen) Color(0xFF4CAF50) else Color(0xFFE53935),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
 
@@ -240,10 +268,8 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: Roun
                         val amountInt = selectedAmount.toIntOrNull() ?: 0
                         if (amountInt > 0) {
                             viewModel.placeBet(amountInt, "RED")
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar("Bet placed: ₹$amountInt on RED ")
-                            }
                         } else {
+                            snackbarHostState.currentSnackbarData?.dismiss()
                             coroutineScope.launch { snackbarHostState.showSnackbar("Enter a valid amount") }
                         }
                     },
@@ -265,10 +291,8 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: Roun
                         val amountInt = selectedAmount.toIntOrNull() ?: 0
                         if (amountInt > 0) {
                             viewModel.placeBet(amountInt, "GREEN")
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar("Bet placed: ₹$amountInt on GREEN")
-                            }
                         } else {
+                            snackbarHostState.currentSnackbarData?.dismiss()
                             coroutineScope.launch { snackbarHostState.showSnackbar("Enter a valid amount") }
                         }
                     },
@@ -289,7 +313,7 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: Roun
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Recent Results",
+                text = "Recent Bets Results",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.align(Alignment.Start)
             )
