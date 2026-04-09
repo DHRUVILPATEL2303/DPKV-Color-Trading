@@ -7,10 +7,13 @@ import com.dpkv.color_trading.common.ResultState
 import com.dpkv.color_trading.data.models.login.LoginResponse
 import com.dpkv.color_trading.data.models.signup.SignUpRequestModel
 import com.dpkv.color_trading.data.models.signup.SignUpResponse
+import com.dpkv.color_trading.datastore.local.TokenManager
 import com.dpkv.color_trading.domain.usecase.authUseCase.LoginUseCase
 import com.dpkv.color_trading.domain.usecase.authUseCase.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,14 +22,20 @@ import kotlin.math.sign
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
+
 
     private val _signUpState = MutableStateFlow(CommonAuthState<SignUpResponse>())
     val signUpState = _signUpState.asStateFlow()
 
     private val _loginState = MutableStateFlow(CommonAuthState<LoginResponse>())
     val loginState = _loginState.asStateFlow()
+
+
+    private val _loginEvent = MutableSharedFlow<Unit>()
+    val loginEvent = _loginEvent.asSharedFlow()
 
 
     fun signUp(email: String, password: String) {
@@ -39,25 +48,47 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _loginState.value = CommonAuthState(isLoading = true)
 
             val result = loginUseCase(email, password)
 
-            _loginState.value = handleResult(result)
+            when (result) {
+                is ResultState.Success -> {
+                    val data = result.data
+
+                    tokenManager.saveTokens(
+                        accessToken = data.accessToken,
+                        refreshToken = data.refreshToken
+                    )
+
+                    _loginEvent.emit(Unit)
+
+                    _loginState.value = CommonAuthState()
+                }
+
+                is ResultState.Error -> {
+                    _loginState.value = CommonAuthState(error = result.error)
+                }
+
+                is ResultState.Loading -> {
+                    _loginState.value = CommonAuthState(isLoading = true)
+                }
+            }
         }
     }
+
 
     private fun <T> handleResult(result: ResultState<T>): CommonAuthState<T> {
         return when (result) {
             is ResultState.Success -> {
-                Log.d("handleResultSuccess",result.data.toString())
-
-                CommonAuthState(success = result.data)
+                Log.d("AuthVM", "Success: ${result.data}")
+                CommonAuthState(data = result.data)
             }
             is ResultState.Error -> {
-                Log.d("handleResulterror",result.error)
+                Log.d("AuthVM", "Error: ${result.error}")
                 CommonAuthState(error = result.error)
             }
             is ResultState.Loading -> {
@@ -65,13 +96,10 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
-
-
-
 }
 
 data class CommonAuthState<T>(
     val isLoading: Boolean = false,
-    val success: T? = null,
-    val error: String ?= null
+    val data: T? = null,
+    val error: String? = null
 )

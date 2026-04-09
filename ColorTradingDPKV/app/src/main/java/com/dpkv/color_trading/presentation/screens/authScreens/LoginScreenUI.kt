@@ -46,8 +46,8 @@ fun LoginScreenUI(
         }
     }
 
-    LaunchedEffect(loginState.success) {
-        if (loginState.success != null) {
+    LaunchedEffect(loginState.data) {
+        if (loginState.data != null) {
             Toast.makeText(context, "Login Successful!", Toast.LENGTH_SHORT).show()
             // Typically navigation happens here, assuming the parent handles the success state or viewmodel does.
         }

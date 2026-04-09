@@ -51,8 +51,8 @@ fun SignUpScreenUI(
         }
     }
 
-    LaunchedEffect(signUpState.success) {
-        if (signUpState.success != null) {
+    LaunchedEffect(signUpState.data) {
+        if (signUpState.data != null) {
             Toast.makeText(context, "Sign Up Successful!", Toast.LENGTH_SHORT).show()
             onSignUpSuccess()
         }

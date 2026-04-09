@@ -10,6 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,17 +20,28 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.dpkv.color_trading.network.SessionManager
 import com.dpkv.color_trading.presentation.screens.authScreens.LoginScreenUI
 import com.dpkv.color_trading.presentation.screens.authScreens.SignUpScreenUI
 import com.dpkv.color_trading.presentation.viewmodels.authviewmodel.AuthViewModel
 
 @Composable
 fun AppNavigation(
-    authViewModel : AuthViewModel = hiltViewModel()
+    authViewModel : AuthViewModel = hiltViewModel(),
+    sessionManager: SessionManager
 ){
 
     val navController = rememberNavController()
     val startScreen = SubNavigation.AuthRoutes
+
+    LaunchedEffect(Unit) {
+        sessionManager.logoutEvent.collect {
+
+            navController.navigate(Routes.LoginScreen) {
+                popUpTo(0)
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
