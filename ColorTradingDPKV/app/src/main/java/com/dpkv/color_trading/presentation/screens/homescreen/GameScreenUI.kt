@@ -1,7 +1,9 @@
 package com.dpkv.color_trading.presentation.screens.homescreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
@@ -45,13 +49,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dpkv.color_trading.presentation.viewmodels.gameviewmodel.GameViewModel
+import com.dpkv.color_trading.presentation.viewmodels.roundViewModel.RoundViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreenUI(viewModel: GameViewModel = hiltViewModel()) {
+fun GameScreenUI(viewModel: GameViewModel = hiltViewModel(),roundViewModel: RoundViewModel = hiltViewModel()) {
     val state = viewModel.uiState.collectAsState().value
+    val roundState = roundViewModel.state.collectAsState().value
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -64,6 +70,15 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel()) {
         if (state.result.isNotEmpty()) {
             resultToShow = state.result
             showResultDialog = true
+        }
+    }
+
+    LaunchedEffect(state.result) {
+        if (state.result.isNotEmpty()) {
+            roundViewModel.onNewResult(
+                roundId = state.roundId,
+                result = state.result
+            )
         }
     }
 
@@ -270,6 +285,64 @@ fun GameScreenUI(viewModel: GameViewModel = hiltViewModel()) {
                     Text("GREEN", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Recent Results",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.align(Alignment.Start)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val history = roundState.history
+            if (history.isNotEmpty()) {
+                val topRow = history.take(5)
+                val bottomRow = history.drop(5).take(5)
+
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        topRow.forEach { item ->
+                            RoundResultItem(item.round, item.result.toString())
+                        }
+                    }
+                    if (bottomRow.isNotEmpty()) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                            bottomRow.forEach { item ->
+                                RoundResultItem(item.round, item.result.toString())
+                            }
+                        }
+                    }
+                }
+            }
         }
+    }
+}
+
+@Composable
+fun RoundResultItem(roundId: Int, result: String) {
+    val isRed = result.equals("RED", ignoreCase = true)
+    val color = if (isRed) Color(0xFFE53935) else Color(0xFF43A047)
+    
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .background(color, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = result.take(1).uppercase(),
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = roundId.toString().takeLast(3),
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
