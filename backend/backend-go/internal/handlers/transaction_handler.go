@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"Color-Trading/backend/backend-go/internal/services"
+	"Color-Trading/backend/backend-go/pkg/response"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,12 +23,9 @@ func (s *TransactionHandler) GetAllTransactionHandler(c *gin.Context) {
 
 	transactions, err := s.service.GetAllUserTransactions(int32(value))
 	if err != nil {
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error in Fetching Transactions",
-		})
+		response.Error(c, http.StatusInternalServerError, "Error in Fetching Transactions")
+		return
 	}
 
-	c.JSON(http.StatusOK, transactions)
-
+	response.Success(c, http.StatusOK, "Transactions fetched", transactions)
 }

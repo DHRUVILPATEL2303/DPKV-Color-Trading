@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"Color-Trading/backend/backend-go/internal/services"
+	"Color-Trading/backend/backend-go/pkg/response"
 	"fmt"
 	"net/http"
 
@@ -28,18 +29,17 @@ func (w *WalletHandler) AddMoney(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		response.Error(c, http.StatusBadRequest, "invalid request")
 		return
 	}
 
 	err = w.service.AddAmount(req.Amount, userId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "money added successfully"})
-
+	response.Success(c, http.StatusOK, "money added successfully", gin.H{"message": "money added successfully"})
 }
 func (w *WalletHandler) DeductMoney(c *gin.Context) {
 	userID := c.GetInt("user_id")
@@ -49,13 +49,14 @@ func (w *WalletHandler) DeductMoney(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		response.Error(c, http.StatusBadRequest, "invalid request")
 		return
 	}
 
 	err = w.service.DeductAmount(req.Amount, userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusInternalServerError, err.Error())
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "money deducted successfully"})
+	response.Success(c, http.StatusOK, "money deducted successfully", gin.H{"message": "money deducted successfully"})
 }

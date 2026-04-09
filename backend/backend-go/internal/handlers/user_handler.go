@@ -3,6 +3,7 @@ package handlers
 import (
 	"Color-Trading/backend/backend-go/internal/services"
 	"Color-Trading/backend/backend-go/pkg/jwtutils"
+	"Color-Trading/backend/backend-go/pkg/response"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,42 +29,41 @@ func (handler *UserHandler) CreateUserAccount(c *gin.Context) {
 	var req AuthRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		response.Error(c, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
 	err := handler.service.SignUp(req.Email, req.Password)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"user": "user created successfully"})
-
+	response.Success(c, http.StatusCreated, "user created successfully", gin.H{"user": "user created successfully"})
 }
 
 func (handler *UserHandler) Login(c *gin.Context) {
 	var req AuthRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		response.Error(c, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
 	user, accessToken, refreshToken, err := handler.service.Login(req.Email, req.Password)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"user_id": user.Id, "email": user.Email, "balance": user.Balance, "accessToken": accessToken, "refreshToken": refreshToken})
+	response.Success(c, http.StatusOK, "login successful", gin.H{"user_id": user.Id, "email": user.Email, "balance": user.Balance, "accessToken": accessToken, "refreshToken": refreshToken})
 }
 func (handler *UserHandler) ValidateToken(c *gin.Context) {
 
 	authHeader := c.GetHeader("Authorization")
 
 	if authHeader == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+		response.Error(c, http.StatusUnauthorized, "missing token")
 		return
 	}
 
@@ -74,17 +74,17 @@ func (handler *UserHandler) ValidateToken(c *gin.Context) {
 
 	token, err := jwtutils.ValidateToken(tokenString)
 	if err != nil || !token.Valid {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		response.Error(c, http.StatusUnauthorized, "invalid token")
 		return
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid claims"})
+		response.Error(c, http.StatusUnauthorized, "invalid claims")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	response.Success(c, http.StatusOK, "token validated", gin.H{
 		"valid":   true,
 		"user_id": claims["user_id"],
 		"email":   claims["email"],
@@ -98,19 +98,19 @@ func (handler *UserHandler) RefreshToken(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": "invalid request"})
+		response.Error(c, 400, "invalid request")
 		return
 	}
 
 	token, err := jwtutils.ValidateToken(req.RefreshToken)
 	if err != nil || !token.Valid {
-		c.JSON(401, gin.H{"error": "invalid token"})
+		response.Error(c, 401, "invalid token")
 		return
 	}
 
 	userID, err := handler.service.FindRefreshToken(req.RefreshToken)
 	if err != nil {
-		c.JSON(401, gin.H{"error": "token not found"})
+		response.Error(c, 401, "token not found")
 		return
 	}
 
@@ -118,7 +118,7 @@ func (handler *UserHandler) RefreshToken(c *gin.Context) {
 
 	newAccessToken, _ := jwtutils.GenerateToken(userID, user.Email)
 
-	c.JSON(200, gin.H{
+	response.Success(c, 200, "token refreshed", gin.H{
 		"access_token": newAccessToken,
 	})
 }
@@ -130,15 +130,15 @@ func (handler *UserHandler) Logout(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": "invalid request"})
+		response.Error(c, 400, "invalid request")
 		return
 	}
 
 	err := handler.service.DeleteRefreshToken(req.RefreshToken)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "failed to logout"})
+		response.Error(c, 500, "failed to logout")
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "logged out successfully"})
+	response.Success(c, 200, "logged out successfully", gin.H{"message": "logged out successfully"})
 }

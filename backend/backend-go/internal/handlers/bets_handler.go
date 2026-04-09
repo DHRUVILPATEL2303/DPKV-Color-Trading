@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"Color-Trading/backend/backend-go/internal/services"
+	"Color-Trading/backend/backend-go/pkg/response"
 	"log"
 	"net/http"
 
@@ -21,12 +22,10 @@ func (h *BetsHandler) GetAllBetsHistory(c *gin.Context) {
 
 	history, err := h.s.GetAllBetsHistory(int32(userId))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
 		log.Println("GetAllBetsHistory error:", err)
+		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, history)
+	response.Success(c, http.StatusOK, "bets history fetched", history)
 }

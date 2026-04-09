@@ -2,6 +2,7 @@ package midddleware
 
 import (
 	"Color-Trading/backend/backend-go/pkg/jwtutils"
+	"Color-Trading/backend/backend-go/pkg/response"
 	"net/http"
 	"strings"
 
@@ -15,23 +16,20 @@ func AuthMiddleware() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "token missing",
-			})
-
+			response.Error(c, http.StatusUnauthorized, "token missing")
 			c.Abort()
 			return
 		}
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		if token == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "token missing",
-			})
+			response.Error(c, http.StatusUnauthorized, "token missing")
+			c.Abort()
+			return
 		}
 
 		validateToken, err := jwtutils.ValidateToken(token)
 		if err != nil || !validateToken.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			response.Error(c, http.StatusUnauthorized, "invalid token")
 			c.Abort()
 			return
 		}
