@@ -3,6 +3,7 @@ package com.dpkv.color_trading.data.di
 import android.content.Context
 import com.dpkv.color_trading.common.BASE_URL
 import com.dpkv.color_trading.data.remote.AuthApi
+import com.dpkv.color_trading.data.remote.HistoryApi
 import com.dpkv.color_trading.data.remote.RoundApi
 import com.dpkv.color_trading.data.websocket.WebSocketManager
 import com.dpkv.color_trading.datastore.local.TokenManager
@@ -111,4 +112,12 @@ object DataModule {
     fun provideRoundApi(
         retrofit: Retrofit
     ): RoundApi = retrofit.create(RoundApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideHistoryApi(
+        retrofit: Retrofit
+    ): HistoryApi {
+        return retrofit.create(HistoryApi::class.java)
+    }
 }

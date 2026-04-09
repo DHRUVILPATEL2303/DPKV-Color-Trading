@@ -36,12 +36,14 @@ import com.dpkv.color_trading.presentation.screens.history.HistoryScreenUI
 import com.dpkv.color_trading.presentation.screens.homescreen.GameScreenUI
 import com.dpkv.color_trading.presentation.viewmodels.authviewmodel.AuthViewModel
 import com.dpkv.color_trading.presentation.viewmodels.gameviewmodel.GameViewModel
+import com.dpkv.color_trading.presentation.viewmodels.histroyViewModel.HistoryViewModel
 import com.dpkv.color_trading.presentation.viewmodels.rootViewModel.RootViewModel
 
 @Composable
 fun AppNavigation(
     authViewModel: AuthViewModel = hiltViewModel(),
     gameViewModel: GameViewModel = hiltViewModel(),
+    historyViewModel: HistoryViewModel = hiltViewModel(),
     sessionManager: SessionManager,
     tokenManager: TokenManager,
     rootViewModel: RootViewModel = hiltViewModel()
@@ -203,7 +205,7 @@ fun AppNavigation(
                     GameScreenUI(gameViewModel, snackbarHostState = snackbarHostState)
                 }
                 composable<Routes.HistoryScreen> {
-                    HistoryScreenUI()
+                    HistoryScreenUI(historyViewModel)
                 }
                 composable<Routes.AccountScreen> {
                     AccountScreenUI(authViewModel, sessionManager)
