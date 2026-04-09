@@ -25,6 +25,53 @@ type AuthRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+func (handler *UserHandler) GetUserById(c *gin.Context) {
+
+	header := c.GetHeader("Authorization")
+
+	if header == "" {
+		response.Error(c, http.StatusUnauthorized, "missing token")
+		return
+	}
+
+	tokenString := header
+	if len(header) > 7 && header[:7] == "Bearer " {
+		tokenString = header[7:]
+	}
+
+	token, err := jwtutils.ValidateToken(tokenString)
+	if err != nil || !token.Valid {
+		response.Error(c, http.StatusUnauthorized, "invalid token")
+		return
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "invalid claims")
+		return
+	}
+
+	userIDFloat, ok := claims["user_id"].(float64)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "invalid user id")
+		return
+	}
+
+	userID := int(userIDFloat)
+
+	user, err := handler.service.FindUserByID(userID)
+	if err != nil {
+		response.Error(c, http.StatusNotFound, "user not found")
+		return
+	}
+
+	response.Success(c, http.StatusOK, "user fetched successfully", gin.H{
+		"user_id": user.Id,
+		"email":   user.Email,
+		"balance": user.Balance,
+	})
+}
+
 func (handler *UserHandler) CreateUserAccount(c *gin.Context) {
 	var req AuthRequest
 

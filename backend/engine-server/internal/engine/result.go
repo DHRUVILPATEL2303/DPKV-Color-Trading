@@ -1,22 +1,40 @@
 package engine
 
+import (
+	"math/rand"
+	"time"
+)
+
+var rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+
 func CalculateResult(bets []Bet) string {
 
-	totals := map[string]int{}
+	if len(bets) == 0 {
+		return getRandomColor()
+	}
+
+	totals := map[string]int{
+		"RED":   0,
+		"GREEN": 0,
+	}
 
 	for _, bet := range bets {
 		totals[bet.Color] += bet.Amount
 	}
 
-	minColor := ""
-	minValue := int(^uint(0) >> 1)
-
-	for color, val := range totals {
-		if val < minValue {
-			minValue = val
-			minColor = color
-		}
+	if totals["RED"] == totals["GREEN"] {
+		return getRandomColor()
 	}
 
-	return minColor
+	if totals["RED"] < totals["GREEN"] {
+		return "RED"
+	}
+	return "GREEN"
+}
+
+func getRandomColor() string {
+	if rng.Intn(2) == 0 {
+		return "RED"
+	}
+	return "GREEN"
 }

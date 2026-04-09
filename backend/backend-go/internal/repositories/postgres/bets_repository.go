@@ -37,7 +37,7 @@ func (b *BetRepository) GetAllBetsHistory(userId int32) ([]*models.Bet, error) {
 		FROM bets
 		WHERE user_id = $1
 		ORDER BY created_at DESC
-		LIMIT 20
+	
 	`, userId)
 	if err != nil {
 		return nil, err
