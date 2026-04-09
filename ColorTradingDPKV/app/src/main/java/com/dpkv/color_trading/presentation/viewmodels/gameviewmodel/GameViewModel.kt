@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.dpkv.color_trading.data.websocket.WsEvent
 import com.dpkv.color_trading.domain.repo.gameREpo.GameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,6 +22,9 @@ class GameViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(GameState())
     val uiState = _uiState.asStateFlow()
+
+    private val _betError = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val betError = _betError.asSharedFlow()
 
     init {
         observeWs()
@@ -44,7 +49,8 @@ class GameViewModel @Inject constructor(
 
                     is WsEvent.Timer -> {
                         _uiState.value = _uiState.value.copy(
-                            secondsLeft = event.data.seconds_left
+                            secondsLeft = event.data.seconds_left,
+                            roundId = event.data.round_id
                         )
                     }
 
@@ -66,6 +72,10 @@ class GameViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(
                             isBettingOpen = false
                         )
+                    }
+
+                    is WsEvent.BetError -> {
+                        _betError.tryEmit(event.message)
                     }
 
                     else -> {
@@ -91,6 +101,7 @@ class GameViewModel @Inject constructor(
         repository.disconnect()
     }
 }
+
 data class GameState(
     val secondsLeft: Int = 0,
     val result: String = "",

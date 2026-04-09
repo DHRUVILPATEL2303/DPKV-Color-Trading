@@ -20,14 +20,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.dpkv.color_trading.network.SessionManager
 import com.dpkv.color_trading.presentation.screens.authScreens.LoginScreenUI
 import com.dpkv.color_trading.presentation.screens.authScreens.SignUpScreenUI
+import com.dpkv.color_trading.presentation.screens.homescreen.GameScreenUI
 import com.dpkv.color_trading.presentation.viewmodels.authviewmodel.AuthViewModel
+import com.dpkv.color_trading.presentation.viewmodels.gameviewmodel.GameViewModel
 
 @Composable
 fun AppNavigation(
     authViewModel : AuthViewModel = hiltViewModel(),
+    gameViewModel: GameViewModel = hiltViewModel<GameViewModel>(),
     sessionManager: SessionManager
 ){
 
@@ -45,8 +49,7 @@ fun AppNavigation(
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
-    ) {
-        paddingValues ->
+    ) { paddingValues ->
         NavHost(
             navController=navController,
             startDestination = startScreen
@@ -58,6 +61,8 @@ fun AppNavigation(
                     LoginScreenUI(authViewModel, onSignUpButtonClick = {
                         navController.navigate(Routes.SignUpScreen)
 
+                    }, onLoginSuccessful = {
+                        navController.navigate(Routes.GameScreen)
                     })
 
                 }
@@ -67,6 +72,16 @@ fun AppNavigation(
                     }, onSignUpSuccess = {
                         navController.navigate(Routes.LoginScreen)
                     })
+                }
+
+            }
+
+            navigation<SubNavigation.HomeRoutes>(
+                startDestination = Routes.GameScreen
+            ){
+                composable<Routes.GameScreen> {
+                    GameScreenUI(gameViewModel)
+
                 }
 
             }

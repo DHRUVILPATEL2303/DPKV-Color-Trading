@@ -6,5 +6,6 @@ sealed class WsEvent {
     data class RoundStart(val data: RoundStartMessage) : WsEvent()
     data class Unknown(val raw: String) : WsEvent()
     data class BettingClosed(val type: String) : WsEvent()
+    data class BetError(val message: String) : WsEvent()
 }
 

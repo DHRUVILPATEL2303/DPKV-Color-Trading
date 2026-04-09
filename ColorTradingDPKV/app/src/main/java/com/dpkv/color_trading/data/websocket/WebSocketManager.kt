@@ -26,8 +26,10 @@ class WebSocketManager @Inject constructor(
 
     private val gson = Gson()
     private val parser = WsParser()
-
-    private val _events = MutableSharedFlow<WsEvent>()
+    private val _events = MutableSharedFlow<WsEvent>(
+        replay = 1,
+        extraBufferCapacity = 10
+    )
     val events = _events.asSharedFlow()
 
     private val _connectionState = MutableStateFlow(false)
@@ -51,7 +53,9 @@ class WebSocketManager @Inject constructor(
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
+                Log.d("WS_RAW", text)
                 val event = parser.parse(text)
+                Log.d("WS_PARSED", event.toString())
                 _events.tryEmit(event)
             }
 

@@ -9,6 +9,9 @@ sealed class Routes {
 
     @Serializable
     object SignUpScreen
+
+    @Serializable
+    object GameScreen
 }
 
 sealed class SubNavigation {
