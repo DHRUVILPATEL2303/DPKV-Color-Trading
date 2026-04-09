@@ -5,6 +5,7 @@ import com.dpkv.color_trading.common.ResultState
 import com.dpkv.color_trading.common.safeApiCall
 import com.dpkv.color_trading.data.models.login.LoginRequestModel
 import com.dpkv.color_trading.data.models.login.LoginResponse
+import com.dpkv.color_trading.data.models.profile.ProfileResponseModel
 import com.dpkv.color_trading.data.models.signup.SignUpRequestModel
 import com.dpkv.color_trading.data.models.signup.SignUpResponse
 import com.dpkv.color_trading.data.remote.AuthApi
@@ -38,5 +39,12 @@ class AuthRepositoryImpl @Inject constructor(
         return safeApiCall {
             authApi.login(request)
         }
+    }
+
+    override suspend fun getUserProfile(): ResultState<ProfileResponseModel> {
+        return safeApiCall {
+            authApi.getUserProfile()
+        }
+
     }
 }
