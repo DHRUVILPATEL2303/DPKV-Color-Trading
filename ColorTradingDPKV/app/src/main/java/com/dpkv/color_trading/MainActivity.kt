@@ -12,6 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.dpkv.color_trading.datastore.local.TokenManager
+import com.dpkv.color_trading.network.SessionManager
 import com.dpkv.color_trading.presentation.navigation.AppNavigation
 import com.dpkv.color_trading.ui.theme.ColorTradingDPKVTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,28 +23,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val tokenManager = TokenManager(this)
+        val sessionManager = SessionManager(tokenManager)
         setContent {
             ColorTradingDPKVTheme {
                 Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    AppNavigation()
+                    AppNavigation(sessionManager =sessionManager)
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ColorTradingDPKVTheme {
-        Greeting("Android")
-    }
-}
