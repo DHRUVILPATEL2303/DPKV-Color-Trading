@@ -6,7 +6,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
@@ -19,8 +22,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -38,6 +44,8 @@ import com.dpkv.color_trading.presentation.viewmodels.authviewmodel.AuthViewMode
 import com.dpkv.color_trading.presentation.viewmodels.gameviewmodel.GameViewModel
 import com.dpkv.color_trading.presentation.viewmodels.histroyViewModel.HistoryViewModel
 import com.dpkv.color_trading.presentation.viewmodels.rootViewModel.RootViewModel
+import com.dpkv.color_trading.ui.theme.DeepNavyBlue
+import com.dpkv.color_trading.ui.theme.SkyBlue
 
 @Composable
 fun AppNavigation(
@@ -87,6 +95,9 @@ fun AppNavigation(
 
     LaunchedEffect(Unit) {
         sessionManager.logoutEvent.collect {
+            authViewModel.clearData()
+            gameViewModel.clearData()
+            historyViewModel.clearData()
             navController.navigate(Routes.LoginScreen) {
                 popUpTo(0)
             }
@@ -101,37 +112,77 @@ fun AppNavigation(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    tonalElevation = 8.dp
+                val isDark = isSystemInDarkTheme()
+                val barColor = if (isDark) SkyBlue else DeepNavyBlue
+                val contentColor = if (isDark) DeepNavyBlue else Color.White
+                
+                Surface(
+                    modifier = Modifier
+                        .padding(start = 24.dp, end = 24.dp, bottom = 2.dp)
+                        .navigationBarsPadding()
+                        .border(
+                            width = 2.dp,
+                            color = Color(168, 92, 50),
+                            shape = RoundedCornerShape(32.dp)
+                        ),
+                    shape = RoundedCornerShape(32.dp),
+                    color = barColor.copy(alpha = 0.9f),
+                    tonalElevation = 0.dp,
+                    shadowElevation = 0.dp
                 ) {
-                    items.forEach { item ->
-                        val isSelected = currentDestination?.hierarchy?.any {
-                            it.hasRoute(item.route::class)
-                        } == true
-                        
-                        NavigationBarItem(
-                            icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) },
-                            selected = isSelected,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                    NavigationBar(
+                        containerColor = Color.Transparent,
+                        contentColor = contentColor,
+                        tonalElevation = 0.dp,
+                        modifier = Modifier.height(64.dp)
+                    ) {
+                        items.forEach { item ->
+                            val isSelected = currentDestination?.hierarchy?.any {
+                                it.hasRoute(item.route::class)
+                            } == true
+
+                            NavigationBarItem(
+                                icon = {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = item.label,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                },
+                                label = {
+                                    if (isSelected){
+
+                                        Text(
+                                            text = item.label,
+                                            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
+                                            fontSize = 11.sp
+                                        )
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                },
+                                selected = isSelected,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = if (isDark) DeepNavyBlue else Color(
+                                        240,
+                                        243,
+                                        245,
+                                        255
+                                    ),
+                                    selectedTextColor = if (isDark) DeepNavyBlue else Color.White,
+                                    unselectedIconColor = contentColor.copy(alpha = 0.3f),
+                                    unselectedTextColor = contentColor.copy(alpha = 0.6f),
+                                    indicatorColor = Color.Transparent
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }

@@ -19,7 +19,6 @@ class WsParser {
             val jsonObject = JsonParser().parse(cleanMessage).asJsonObject
             val type = jsonObject.get("type")?.asString
 
-            // No 'type' field — treat as a server error/response message
             if (type == null) {
                 val errorMsg = jsonObject.get("message")?.asString
                 return if (errorMsg != null) WsEvent.BetError(errorMsg) else WsEvent.Unknown(cleanMessage)

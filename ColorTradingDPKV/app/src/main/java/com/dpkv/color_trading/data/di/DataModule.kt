@@ -35,8 +35,9 @@ object DataModule {
     @Provides
     @Singleton
     fun provideSessionManager(
-        tokenManager: TokenManager
-    ): SessionManager = SessionManager(tokenManager)
+        tokenManager: TokenManager,
+        webSocketManager: WebSocketManager
+    ): SessionManager = SessionManager(tokenManager, webSocketManager)
 
     @Provides
     @Singleton
@@ -60,7 +61,7 @@ object DataModule {
     fun provideTokenAuthenticator(
         tokenManager: TokenManager,
         @Named("refreshApi") authApi: AuthApi,
-        sessionManager: SessionManager
+        sessionManager: dagger.Lazy<SessionManager>
     ): TokenAuthenticator {
         return TokenAuthenticator(tokenManager, authApi, sessionManager)
     }

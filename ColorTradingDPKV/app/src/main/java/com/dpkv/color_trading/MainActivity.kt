@@ -16,15 +16,23 @@ import com.dpkv.color_trading.datastore.local.TokenManager
 import com.dpkv.color_trading.network.SessionManager
 import com.dpkv.color_trading.presentation.navigation.AppNavigation
 import com.dpkv.color_trading.ui.theme.ColorTradingDPKVTheme
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var tokenManager: TokenManager
+
+    @Inject
+    lateinit var sessionManager: SessionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val tokenManager = TokenManager(this)
-        val sessionManager = SessionManager(tokenManager)
         setContent {
             ColorTradingDPKVTheme {
                 Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->

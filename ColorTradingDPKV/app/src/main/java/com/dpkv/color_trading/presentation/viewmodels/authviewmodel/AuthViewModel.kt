@@ -109,6 +109,12 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun clearData() {
+        _profileState.value = CommonAuthState()
+        _loginState.value = CommonAuthState()
+        _signUpState.value = CommonAuthState()
+    }
+
     private fun <T> handleResult(result: ResultState<T>): CommonAuthState<T> {
         return when (result) {
             is ResultState.Success -> {
