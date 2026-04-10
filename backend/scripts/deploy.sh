@@ -1,38 +1,36 @@
 #!/bin/bash
 
-# Exit on any error
 set -e
 
 echo "----------------------------------------"
 echo "Deploying Color Trading Backend"
 echo "----------------------------------------"
 
-# Ensure we are in the project root
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR/.."
 
-# Check for .env file
+# ✅ ENV CHECK
 if [ ! -f .env ]; then
-    echo "Warning: .env file not found. Creating from .env.example..."
+    echo "Warning: .env not found"
+    
     if [ -f .env.example ]; then
         cp .env.example .env
-        echo "Please edit .env with your production credentials."
+        echo "Created .env from example. Please edit it!"
     else
-        echo "Error: .env.example not found. Please create a .env file."
+        echo "Error: No .env or .env.example found"
         exit 1
     fi
 fi
 
-# Pull/Build and start containers
+# ✅ USE CORRECT COMMAND
 echo "Starting services..."
-docker compose up -d --build
+docker-compose up -d --build
 
-# Cleanup old images to save disk space
-echo "Cleaning up dangling images..."
+# ✅ CLEANUP
+echo "Cleaning old images..."
 docker image prune -f
 
 echo "----------------------------------------"
 echo "Deployment Successful!"
-echo "Services are running in the background."
-echo "Check status with: docker compose ps"
+echo "Check status: docker ps"
 echo "----------------------------------------"
