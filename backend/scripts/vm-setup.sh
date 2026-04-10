@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Exit on any error
 set -e
 
 echo "----------------------------------------"
@@ -22,7 +21,6 @@ else
     echo "Swap file already exists."
 fi
 
-# Install dependencies
 echo "[3/5] Installing system dependencies..."
 sudo apt-get install -y \
     ca-certificates \
@@ -33,6 +31,12 @@ sudo apt-get install -y \
     htop \
     ufw
 
+echo "[4/5] Installing Docker..."
+if ! command -v docker &> /dev/null; then
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+    rm get-docker.sh
+else
     echo "Docker already installed."
 fi
 
