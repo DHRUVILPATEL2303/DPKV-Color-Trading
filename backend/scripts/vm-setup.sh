@@ -7,9 +7,10 @@ echo "----------------------------------------"
 echo "Starting GCP VM Setup for Color Trading"
 echo "----------------------------------------"
 
-# Update system
-echo "[1/5] Updating system packages..."
-sudo apt-get update && sudo apt-get upgrade -y
+# Update system (Lightweight)
+echo "[1/5] Updating package lists..."
+sudo apt-get update
+# We skip 'upgrade -y' here because it's too heavy for e2-small (e.g. Google Cloud SDK).
 
 # Add swap file (Essential for 2GB RAM instances)
 echo "[2/5] Creating 2GB swap file..."
