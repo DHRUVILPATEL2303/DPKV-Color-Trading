@@ -12,7 +12,7 @@ import okhttp3.Route
 class TokenAuthenticator(
     private val tokenManager: TokenManager,
     private val authApi: AuthApi,
-    private val sessionManager: SessionManager
+    private val sessionManagerLazy: dagger.Lazy<SessionManager>
 ) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
@@ -40,7 +40,7 @@ class TokenAuthenticator(
         if (!body.success) {
             runBlocking { tokenManager.clearTokens() }
             runBlocking {
-                sessionManager.logout()
+                sessionManagerLazy.get().logout()
             }
             return null
         }

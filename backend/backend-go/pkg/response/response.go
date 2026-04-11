@@ -2,7 +2,6 @@ package response
 
 import "github.com/gin-gonic/gin"
 
-// APIResponse represents a generic structured format for all API responses
 type APIResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message,omitempty"`
@@ -10,7 +9,7 @@ type APIResponse struct {
 	Error   string      `json:"error,omitempty"`
 }
 
-// Success sends a generic success response
+
 func Success(c *gin.Context, statusCode int, message string, data interface{}) {
 	c.JSON(statusCode, APIResponse{
 		Success: true,
@@ -19,7 +18,6 @@ func Success(c *gin.Context, statusCode int, message string, data interface{}) {
 	})
 }
 
-// Error sends a generic error response
 func Error(c *gin.Context, statusCode int, errorMsg string) {
 	c.JSON(statusCode, APIResponse{
 		Success: false,

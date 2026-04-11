@@ -118,3 +118,13 @@ CREATE INDEX IF NOT EXISTS idx_rounds_status ON rounds(status);
 ALTER TABLE bets DROP CONSTRAINT IF EXISTS unique_user_round;
 
 ALTER TABLE bets ALTER COLUMN result SET DEFAULT 'PENDING';
+
+
+CREATE TABLE IF NOT EXISTS admin_logs (
+                                          id SERIAL PRIMARY KEY,
+                                          admin_id INT NOT NULL,
+                                          user_id INT NOT NULL,
+                                          amount INT NOT NULL,
+                                          action TEXT NOT NULL, -- ADD / DEDUCT
+                                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

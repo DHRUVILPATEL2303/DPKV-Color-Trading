@@ -51,9 +51,11 @@ class GameViewModel @Inject constructor(
                 when (event) {
 
                     is WsEvent.Timer -> {
+                        val isBettingOpen = event.data.seconds_left >= 6
                         _uiState.value = _uiState.value.copy(
                             secondsLeft = event.data.seconds_left,
-                            roundId = event.data.round_id
+                            roundId = event.data.round_id,
+                            isBettingOpen = isBettingOpen
                         )
                     }
 
@@ -100,6 +102,10 @@ class GameViewModel @Inject constructor(
         repository.placeBet(amount, color)
     }
 
+    fun clearData() {
+        _uiState.value = GameState()
+    }
+
     override fun onCleared() {
         super.onCleared()
         repository.disconnect()
@@ -111,5 +117,5 @@ data class GameState(
     val result: String = "",
     val roundId: Int = 0,
     val isConnected: Boolean = false,
-    val isBettingOpen: Boolean = true
+    val isBettingOpen: Boolean = false
 )

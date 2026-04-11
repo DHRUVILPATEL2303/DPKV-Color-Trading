@@ -67,7 +67,7 @@ fun GameScreenUI(
 ) {
     val state = viewModel.uiState.collectAsState().value
     val roundState = roundViewModel.state.collectAsState().value
-    // val snackbarHostState = remember { SnackbarHostState() } // Removed local state
+    // val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     var selectedAmount by remember { mutableStateOf("10") }
@@ -156,7 +156,7 @@ fun GameScreenUI(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Color Trading") },
+                title = { Text("Color Trading", fontWeight = FontWeight.Bold) },
                 actions = {
                     val statusText = if (state.isConnected) "Online" else "Offline"
                     val statusColor = if (state.isConnected) Color(0xFF4CAF50) else Color(0xFFE53935)
@@ -165,8 +165,8 @@ fun GameScreenUI(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = Color.Transparent,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         }

@@ -59,6 +59,10 @@ class HistoryViewModel @Inject constructor(
             )
         }
     }
+
+    fun clearData() {
+        _state.value = HistoryState()
+    }
 }
 
 data class HistoryState(
