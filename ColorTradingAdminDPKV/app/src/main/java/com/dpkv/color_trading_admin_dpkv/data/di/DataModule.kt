@@ -3,7 +3,9 @@ package com.dpkv.color_trading_admin_dpkv.data.di
 import androidx.annotation.Size
 import androidx.core.view.WindowInsetsCompat
 import com.dpkv.color_trading_admin_dpkv.common.BASE_URL
+import com.dpkv.color_trading_admin_dpkv.data.remote.AdminLogApi
 import com.dpkv.color_trading_admin_dpkv.data.remote.FundsApi
+import com.dpkv.color_trading_admin_dpkv.data.remote.RoundApi
 import com.dpkv.color_trading_admin_dpkv.network.AdminInterceptor
 import dagger.Module
 import dagger.Provides
@@ -50,5 +52,21 @@ object DataModule {
         retrofit: Retrofit
     ) : FundsApi {
        return retrofit.create<FundsApi>(FundsApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAdminLogApi(
+        retrofit: Retrofit
+    ): AdminLogApi {
+       return  retrofit.create<AdminLogApi>(AdminLogApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRoundApi(
+        retrofit: Retrofit
+    ): RoundApi {
+        return retrofit.create<RoundApi>(RoundApi::class.java)
     }
 }

@@ -3,9 +3,8 @@ package com.dpkv.color_trading_admin_dpkv.domain.useCase.adminLogUseCase
 import com.dpkv.color_trading_admin_dpkv.domain.repo.adminLog.AdminLogRepository
 import javax.inject.Inject
 
-class GetAllAdminLogsUseCase @Inject constructor(
+class GetPaginatedAdminLogsUseCase @Inject constructor(
     private val adminLogRepository: AdminLogRepository
 ) {
-
-    suspend operator fun invoke(page : Int , limit : Int) = adminLogRepository.getAllAdminLogs(page,limit)
+    operator fun invoke() = adminLogRepository.getPaginatedAdminLogs()
 }

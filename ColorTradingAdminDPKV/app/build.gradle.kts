@@ -79,4 +79,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // Paging 3
+    implementation("androidx.paging:paging-runtime-ktx:3.3.0")
+    implementation("androidx.paging:paging-compose:3.3.5")
 }

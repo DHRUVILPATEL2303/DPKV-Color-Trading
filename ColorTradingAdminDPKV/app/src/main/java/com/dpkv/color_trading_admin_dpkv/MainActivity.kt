@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import com.dpkv.color_trading_admin_dpkv.presentation.navigation.AppNavigation
 import com.dpkv.color_trading_admin_dpkv.ui.theme.ColorTradingAdminDPKVTheme
-import com.dpkv.color_trading_admin_dpkv.presentation.screens.homeScreen.HomeScreenUI
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

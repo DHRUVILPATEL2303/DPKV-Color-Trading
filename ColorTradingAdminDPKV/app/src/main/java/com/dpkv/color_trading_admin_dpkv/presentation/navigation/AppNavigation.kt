@@ -8,26 +8,20 @@ import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.dpkv.color_trading_admin_dpkv.presentation.screens.homeScreen.HomeScreenUI
 import kotlinx.coroutines.flow.combine
 
+import com.dpkv.color_trading_admin_dpkv.presentation.screens.dashboard.DashboardScreen
+
 @Composable
-fun AppNavigation(){
+fun AppNavigation() {
     val navController = rememberNavController()
-    Scaffold(
-        modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
-
-        NavHost(
-            navController=navController,
-            startDestination=Routes.HomeScreen
-
-        ){
-            composable<Routes.HomeScreen> {
-                HomeScreenUI()
-
-            }
+    
+    NavHost(
+        navController = navController,
+        startDestination = Routes.Dashboard
+    ) {
+        composable<Routes.Dashboard> {
+            DashboardScreen()
         }
-
     }
 }
