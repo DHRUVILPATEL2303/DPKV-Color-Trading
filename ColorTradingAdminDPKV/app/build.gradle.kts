@@ -10,13 +10,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.color_trading_dpkv_admin"
+    namespace = "com.dpkv.color_trading_dpkv_admin"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.color_trading_dpkv_admin"
+        applicationId = "com.dpkv.color_trading_dpkv_admin"
         minSdk = 30
         targetSdk = 36
         versionCode = 1
