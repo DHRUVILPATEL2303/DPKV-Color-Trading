@@ -128,3 +128,6 @@ CREATE TABLE IF NOT EXISTS admin_logs (
                                           action TEXT NOT NULL, -- ADD / DEDUCT
                                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_admin_logs_created_at ON admin_logs(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_rounds_round_number ON rounds(round_number DESC);

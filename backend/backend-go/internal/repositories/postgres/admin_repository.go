@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"Color-Trading/backend/backend-go/internal/models"
 	"database/sql"
 	"errors"
 )
@@ -18,13 +19,20 @@ func NewAdminRepository(db *sql.DB) *AdminRepository {
 type IAdminRepository interface {
 	AddFunds(userID int32, amount int64, adminId int64) error
 	DeductFunds(userID int32, amount int64, adminId int64) error
+	GetAdminLogs(page int, limit int) ([]*models.AdminLog, int, error)
 }
 
 func (r *AdminRepository) AddFunds(userID int32, amount int64, adminId int64) error {
+
+	if amount <= 0 {
+		return errors.New("invalid amount")
+	}
+
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
 	var balance int64
 	err = tx.QueryRow(`
@@ -32,16 +40,16 @@ func (r *AdminRepository) AddFunds(userID int32, amount int64, adminId int64) er
 	`, userID).Scan(&balance)
 
 	if err != nil {
-		tx.Rollback()
+		if err == sql.ErrNoRows {
+			return errors.New("user not found")
+		}
 		return err
 	}
 
 	_, err = tx.Exec(`
 		UPDATE users SET balance = balance + $1 WHERE id=$2
 	`, amount, userID)
-
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -49,9 +57,7 @@ func (r *AdminRepository) AddFunds(userID int32, amount int64, adminId int64) er
 		INSERT INTO transactions (user_id, amount, type)
 		VALUES ($1, $2, 'CREDIT_ADMIN')
 	`, userID, amount)
-
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -59,9 +65,7 @@ func (r *AdminRepository) AddFunds(userID int32, amount int64, adminId int64) er
 		INSERT INTO admin_logs (admin_id, user_id, amount, action)
 		VALUES ($1, $2, $3, 'ADD')
 	`, adminId, userID, amount)
-
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -118,4 +122,51 @@ func (r *AdminRepository) DeductFunds(userID int32, amount int64, adminId int64)
 	}
 
 	return tx.Commit()
+}
+
+func (r *AdminRepository) GetAdminLogs(page int, limit int) ([]*models.AdminLog, int, error) {
+
+	offset := (page - 1) * limit
+
+	var total int
+	err := r.db.QueryRow(`
+		SELECT COUNT(*) FROM admin_logs
+	`).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	rows, err := r.db.Query(`
+		SELECT id, admin_id, user_id, amount, action, created_at
+		FROM admin_logs
+		ORDER BY created_at DESC
+		LIMIT $1 OFFSET $2
+	`, limit, offset)
+
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var logs []*models.AdminLog
+
+	for rows.Next() {
+		var log models.AdminLog
+
+		err := rows.Scan(
+			&log.Id,
+			&log.AdminId,
+			&log.UserId,
+			&log.Amount,
+			&log.Action,
+			&log.CreatedAt,
+		)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		logs = append(logs, &log)
+	}
+
+	return logs, total, nil
 }

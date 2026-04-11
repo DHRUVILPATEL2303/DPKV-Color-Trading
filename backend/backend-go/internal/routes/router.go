@@ -45,8 +45,10 @@ func SetUpRouter(db *sql.DB) *gin.Engine {
 	roundRedisService := redis4.NewRoundRedisService(roundRepo)
 	roundHandler := handlers.NewRoundHandler(roundRedisService)
 
+	roundPostgresRepo := postgres.NewRoundsRepository(db)
+
 	adminRepo := postgres.NewAdminRepository(db)
-	adminService := services.NewAdminService(adminRepo)
+	adminService := services.NewAdminService(adminRepo, roundPostgresRepo)
 	adminHandler := handlers.NewAdminHandler(*adminService)
 
 	AuthRoutes(api, userHandler)

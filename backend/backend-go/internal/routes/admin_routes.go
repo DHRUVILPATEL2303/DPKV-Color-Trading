@@ -12,5 +12,7 @@ func AdminRoutes(r *gin.RouterGroup, handler *handlers.AdminHandler) {
 	router := r.Group("/admin")
 	router.POST("/add-funds", admin.AdminOnly, handler.AddFunds)
 	router.POST("/deduct-funds", admin.AdminOnly, handler.DeductFunds)
+	router.GET("/logs", admin.AdminOnly, handler.GetAdminLogs)
+	router.GET("/rounds", handler.GetRounds)
 
 }
