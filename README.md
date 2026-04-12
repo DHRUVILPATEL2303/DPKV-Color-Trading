@@ -1,10 +1,10 @@
-# 💠 Color Trading Infrastructure — High-Performance Microservices
+#  Color Trading Infrastructure — High-Performance Microservices
 
 A state-of-the-art, real-time color trading platform engineered for sub-millisecond execution, massive scale, and industrial-grade security. This project implements a sophisticated microservice mesh using **Go (Golang)**, **gRPC**, **Redis Pub/Sub**, and **PostgreSQL**.
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 The ecosystem is partitioned into specialized services to ensure maximum isolation, fault tolerance, and horizontal scalability.
 
@@ -94,7 +94,7 @@ graph TB
 
 ---
 
-## ⚡ Architecture Flow: End-to-End Bet Execution
+##  Architecture Flow: End-to-End Bet Execution
 The following sequence illustrates the high-speed orchestration between microservices during a live betting event.
 
 ```mermaid
@@ -127,16 +127,16 @@ sequenceDiagram
 
 ---
 
-## 🚀 Performance & Concurrency Pillars
+##  Performance & Concurrency Pillars
 
-### 🧵 Ultra-Fast Concurrency
+###  Ultra-Fast Concurrency
 *   **Settlement Worker Pool:** On round completion, the Engine leverages a specialized pool of **20 concurrent goroutines**. This enables parallel settlement of thousands of bets in milliseconds, ensuring users see their winnings instantly.
 *   **Non-Blocking Pub/Sub:** Real-time state (timer ticks, results) is broadcasted via Redis Pub/Sub. The WebSocket server consumes these events asynchronously, preventing bottlenecks even with massive user concurrency.
 
-### 🛡️ Safety & Integrity
+###  Safety & Integrity
 The system implements a zero-trust architecture where security is enforced at every hop.
 
-#### 🚦 Intelligent Rate Limiting
+####  Intelligent Rate Limiting
 Nginx acts as a traffic warden, preventing brute-force attacks and API abuse using precise rate-limiting zones.
 *   **Threshold:** 10 requests per second per IP.
 *   **Burst:** Up to 20 requests allowed before throttling kicks in.
@@ -155,20 +155,20 @@ http {
 }
 ```
 
-#### 🔐 Internal Secret Injection
+####  Internal Secret Injection
 To prevent users from bypassing Nginx and hitting microservices directly, Nginx injects a cryptographic **X-Internal-Secret** header. Services reject any request that lacks this secret, ensuring that the API Gateway is the **only** entry point.
 
-#### 🧵 Advanced Concurrency in Go
+#### Advanced Concurrency in Go
 *  **Worker Pools:** On round completion, the Engine leverages a specialized pool of **20 concurrent goroutines**. This enables parallel settlement of thousands of bets in milliseconds, ensuring users see their winnings instantly.
 *   **Non-Blocking Pub/Sub:** Real-time state (timer ticks, results) is broadcasted via Redis Pub/Sub. The WebSocket server consumes these events asynchronously, preventing bottlenecks even with massive user concurrency.
 
-#### 🛡️ Data Integrity
+####  Data Integrity
 *   **gRPC Contracts:** All internal communication is strictly typed using Protocol Buffers. This prevents data corruption and provides a 10x performance boost over traditional HTTP/JSON.
 *   **Atomic Persistence:** All financial operations (credits/debits) are executed within strict SQL transactions to ensure eventual consistency and zero data loss.
 
 ---
 
-## 📊 Infrastructure Stack
+##  Infrastructure Stack
 
 | Component | Technology | Primary Role |
 | :--- | :--- | :--- |
@@ -181,7 +181,7 @@ To prevent users from bypassing Nginx and hitting microservices directly, Nginx 
 
 ---
 
-## 🛠️ Microservice Directory
+##  Microservice Directory
 
 *   **`backend-go`**: The source of truth for user accounts, wallets, and transaction history.
 *   **`engine-server`**: The heartbeat of the game. Manages round cycles, settlement logic, and result generation.
@@ -190,6 +190,5 @@ To prevent users from bypassing Nginx and hitting microservices directly, Nginx 
 
 ---
 
-### 🎨 Design Credits
-Developed with a focus on **Premium Performance** and **System Resilience**. 🚀
+
 
