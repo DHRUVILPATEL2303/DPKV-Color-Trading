@@ -40,7 +40,7 @@ fi
 
 # 🔥 Stop old containers
 echo "Stopping old containers..."
-$COMPOSE_CMD down
+$COMPOSE_CMD down --remove-orphans
 
 # 🚀 Start new containers
 echo "Starting services..."

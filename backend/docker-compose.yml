@@ -27,7 +27,7 @@ services:
       timeout: 5s
       retries: 5
 
-  backend-go:;
+  backend-go:
     build:
       context: ./backend-go
       dockerfile: Dockerfile
