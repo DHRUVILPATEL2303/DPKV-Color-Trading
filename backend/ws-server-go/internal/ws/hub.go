@@ -34,7 +34,14 @@ func (h *Hub) BroadcastMessage(message any) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	for client := range h.clients {
-		err := client.WriteJSON(message)
+		var err error
+		if str, ok := message.(string); ok {
+			err = client.WriteMessage(websocket.TextMessage, []byte(str))
+		} else if b, ok := message.([]byte); ok {
+			err = client.WriteMessage(websocket.TextMessage, b)
+		} else {
+			err = client.WriteJSON(message)
+		}
 		if err != nil {
 			client.Close()
 			delete(h.clients, client)

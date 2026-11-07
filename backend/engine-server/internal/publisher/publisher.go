@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"strings"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -17,9 +18,17 @@ func NewPublisher() *Publisher {
 	if addr == "" {
 		addr = "localhost:6379"
 	}
-	rdb := redis.NewClient(&redis.Options{
-		Addr: addr,
-	})
+	var rdb *redis.Client
+	if strings.HasPrefix(addr, "redis://") || strings.HasPrefix(addr, "rediss://") {
+		if opt, err := redis.ParseURL(addr); err == nil {
+			rdb = redis.NewClient(opt)
+		}
+	}
+	if rdb == nil {
+		rdb = redis.NewClient(&redis.Options{
+			Addr: addr,
+		})
+	}
 
 	return &Publisher{rdb}
 

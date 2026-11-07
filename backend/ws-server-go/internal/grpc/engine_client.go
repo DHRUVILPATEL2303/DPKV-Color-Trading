@@ -7,6 +7,7 @@ import (
 	pb "ws-server-go/ws-server-go/Color-Trading/backend/ws-server-go/proto/enginepb"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type EngineClient struct {
@@ -20,7 +21,7 @@ func NewEngineClient() *EngineClient {
 		addr = "localhost:8083"
 	}
 
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal("Failed to connect to engine:", err)
 	}

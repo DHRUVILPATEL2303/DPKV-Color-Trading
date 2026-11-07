@@ -8,6 +8,8 @@ services:
     envVars:
       - key: DATABASE_URL
         value: "postgresql://dpkv_trading_user:ELOzxm7VeO8JWkYhCLW0LxZ4dNcVaPME@dpg-d7b9e3ea2pns73be1rfg-a/dpkv_trading"
+      - key: REDIS_URL
+        value: "rediss://default:gQAAAAAAAXHFAAIncDIxZDRkNTNjOTIyMmU0Mzg2YmI3Y2Y2ZTNlZWM5MTI1OHAyOTQ2NjE@open-horse-94661.upstash.io:6379"
       - key: PORT
         value: "8080" 
 

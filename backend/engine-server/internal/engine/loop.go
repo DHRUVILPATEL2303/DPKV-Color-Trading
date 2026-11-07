@@ -23,9 +23,12 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 
 		m.StartNewRound(roundID)
 
-		api.CreateRound(ctx, &pb.CreateRoundRequest{
+		_, err := api.CreateRound(ctx, &pb.CreateRoundRequest{
 			Round: int32(roundID),
 		})
+		if err != nil {
+			log.Printf("Error creating round %d: %v\n", roundID, err)
+		}
 
 		publisher.Publish("game_updates", map[string]any{
 			"type":     "ROUND_START",
@@ -73,7 +76,7 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 			Status:   "COMPLETED",
 		})
 
-		err := publisher.Publish("game_updates", map[string]any{
+		err = publisher.Publish("game_updates", map[string]any{
 			"type":     "RESULT",
 			"round_id": roundID,
 			"result":   result,
@@ -84,8 +87,8 @@ func StartGameLoop(m *Manager, store *BetStore, publisher *publisher.Publisher, 
 			Color: result,
 		})
 		if err != nil || !betResult.Success {
-			log.Println(err)
-			log.Println("for round %s betting result for updaterequest %s", roundID, betResult)
+			log.Println("Error updating bet result:", err)
+			log.Printf("for round %d betting result for updaterequest: %v\n", roundID, betResult)
 		}
 
 		data := map[string]any{

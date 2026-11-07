@@ -1,3 +1,4 @@
 package com.dpkv.color_trading.common
 
-const val BASE_URL = "http://10.0.2.2:8085/"
+const val BASE_URL = "https://api.color.dpkvtrading.online/"
+const val WS_URL = "wss://api.color.dpkvtrading.online/ws"

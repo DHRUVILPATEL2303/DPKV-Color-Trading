@@ -1,0 +1,23 @@
+(api_proxy) {
+	handle /api/* {
+		reverse_proxy http://backend-go:8080 {
+			header_up X-Internal-Secret "dpkv123123"
+		}
+	}
+
+	handle /ws* {
+		reverse_proxy http://ws-server-go:8090 {
+			header_up X-Internal-Secret "dpkv123123"
+		}
+	}
+}
+
+# 1. Main Domain: Automatic HTTPS with Let's Encrypt / ZeroSSL
+{$DOMAIN:api.color.dpkvtrading.online} {
+	import api_proxy
+}
+
+# 2. Port 8085: Also keep local/direct access open
+:8085 {
+	import api_proxy
+}

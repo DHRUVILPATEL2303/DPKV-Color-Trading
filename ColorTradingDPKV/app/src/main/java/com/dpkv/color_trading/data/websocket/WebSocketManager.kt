@@ -42,7 +42,7 @@ class WebSocketManager @Inject constructor(
         val token = tokenManager.getAccessToken() ?: return
 
         val request = Request.Builder()
-            .url("ws://10.0.2.2:8085/ws?token=$token")
+            .url("${com.dpkv.color_trading.common.WS_URL}?token=$token")
             .build()
 
         webSocket = okHttpClient.newWebSocket(request, object : WebSocketListener() {

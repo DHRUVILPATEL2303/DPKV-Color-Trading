@@ -16,8 +16,12 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # ✅ Check Docker Compose
-if ! command -v docker-compose &> /dev/null; then
-    echo "docker-compose not installed!"
+if command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+elif docker compose version &> /dev/null; then
+    COMPOSE_CMD="docker compose"
+else
+    echo "Error: Neither 'docker-compose' nor 'docker compose' is installed!"
     exit 1
 fi
 
@@ -36,11 +40,11 @@ fi
 
 # 🔥 Stop old containers
 echo "Stopping old containers..."
-docker-compose down
+$COMPOSE_CMD down
 
 # 🚀 Start new containers
 echo "Starting services..."
-docker-compose up -d --build
+$COMPOSE_CMD up -d --build
 
 # 🧹 Cleanup
 echo "Cleaning old images..."

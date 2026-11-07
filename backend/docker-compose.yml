@@ -1,14 +1,12 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: Dhruv@9898989898989898989
       POSTGRES_DB: color_trading
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -21,18 +19,29 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  backend-go:
+  backend-go:;
     build:
       context: ./backend-go
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: "postgres://postgres:password@postgres:5432/color_trading?sslmode=disable"
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:password@postgres:5432/color_trading?sslmode=disable}
+      REDIS_URL: ${REDIS_URL:-redis:6379}
+      PORT: "8080"
     ports:
       - "8080:8080"
       - "8082:8082"
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: always
 
@@ -41,13 +50,16 @@ services:
       context: ./engine-server
       dockerfile: Dockerfile
     environment:
-      REDIS_URL: "redis:6379"
-      BACKEND_GO_GRPC_URL: "backend-go:8082"
+      REDIS_URL: ${REDIS_URL:-redis:6379}
+      BACKEND_GO_GRPC_URL: ${BACKEND_GO_GRPC_URL:-backend-go:8082}
+      PORT: "9009"
     ports:
       - "8083:8083"
     depends_on:
-      - redis
-      - backend-go
+      redis:
+        condition: service_healthy
+      backend-go:
+        condition: service_started
     restart: always
 
   ws-server-go:
@@ -55,27 +67,41 @@ services:
       context: .
       dockerfile: ws-server-go/Dockerfile
     environment:
-      REDIS_URL: "redis:6379"
-      BACKEND_GO_GRPC_URL: "backend-go:8082"
-      ENGINE_SERVER_GRPC_URL: "engine-server:8083"
+      REDIS_URL: ${REDIS_URL:-redis:6379}
+      BACKEND_GO_GRPC_URL: ${BACKEND_GO_GRPC_URL:-backend-go:8082}
+      ENGINE_SERVER_GRPC_URL: ${ENGINE_SERVER_GRPC_URL:-engine-server:8083}
+      PORT: "8090"
     ports:
       - "8090:8090"
     depends_on:
-      - redis
-      - engine-server
-      - backend-go
+      redis:
+        condition: service_healthy
+      engine-server:
+        condition: service_started
+      backend-go:
+        condition: service_started
     restart: always
 
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+  caddy:
+    image: caddy:2-alpine
+    restart: always
     ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
       - "8085:8085"
+    environment:
+      DOMAIN: ${DOMAIN:-api.color.dpkvtrading.online}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
       - backend-go
       - ws-server-go
-    restart: always
 
 volumes:
   postgres_data:
+  redis_data:
+  caddy_data:
+  caddy_config:
