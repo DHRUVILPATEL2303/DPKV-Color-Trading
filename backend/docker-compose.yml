@@ -3,7 +3,7 @@ services:
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Dhruv@9898989898989898989
+      POSTGRES_PASSWORD: Dhruv9898989898989898989
       POSTGRES_DB: color_trading
     ports:
       - "5432:5432"
@@ -32,7 +32,7 @@ services:
       context: ./backend-go
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:Dhruv%4098989898989898989@postgres:5432/color_trading?sslmode=disable}
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:Dhruv9898989898989898989@postgres:5432/color_trading?sslmode=disable}
       REDIS_URL: ${REDIS_URL:-redis:6379}
       PORT: "8080"
     ports:
